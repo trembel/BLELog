@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import logging
-from typing import List
+from typing import Any, List
 import asyncio
 from asyncio import Event, Queue
 
@@ -10,7 +10,7 @@ from blelog.Configuration import Characteristic, Configuration
 
 class Consumer(ABC):
     @abstractmethod
-    async def run(self, halt: Event, input: Queue) -> None:
+    async def run(self, halt: Event, input_q: Queue) -> None:
         pass
 
 
@@ -19,7 +19,7 @@ class NotifData:
     device_adr: str
     device_name_repr: str
     characteristic: Characteristic
-    data: List[float]
+    data: List[List[Any]]
 
 
 class ConsumerMgr:
@@ -27,7 +27,7 @@ class ConsumerMgr:
         self.config = config
         self.consumers = consumers
         self.consumer_tasks = []
-        self.input = Queue()
+        self.input_q = Queue()
         self.outputs = []  # type: List[Queue]
 
     async def run(self, halt: Event) -> None:
@@ -42,7 +42,7 @@ class ConsumerMgr:
 
             while not halt.is_set():
                 try:
-                    next_data = await asyncio.wait_for(self.input.get(), timeout=0.5)
+                    next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)
                     for out in self.outputs:
                         await out.put(next_data)
                 except asyncio.TimeoutError:
@@ -53,4 +53,4 @@ class ConsumerMgr:
             halt.set()
         finally:
             await asyncio.gather(*self.consumer_tasks)
-            print('ConsumerMgr Shutdown...')
+            print('ConsumerMgr shut down...')

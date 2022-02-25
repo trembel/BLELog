@@ -3,17 +3,7 @@ import logging
 from typing import List
 
 from blelog.Configuration import Configuration
-from blelog.tui.TUI import TUIComponent
-
-
-class LogHandler(logging.Handler):
-    def __init__(self, output: deque):
-        super().__init__()
-        self.out = output
-
-    def handle(self, record: logging.LogRecord) -> bool:
-        self.out.append(record)
-        return True
+from blelog.tui.TUI import TUIComponent, LogHandler
 
 
 class TUI_Log(TUIComponent):
@@ -31,9 +21,9 @@ class TUI_Log(TUIComponent):
 
         if self.config.plain_ascii_tui:
             self.icon = {
-                'INFO': '   ',
+                'INFO': '    ',
                 'WARNING': 'WARN',
-                'ERROR': 'ERR'
+                'ERROR': 'ERR '
             }
         else:
             self.icon = {

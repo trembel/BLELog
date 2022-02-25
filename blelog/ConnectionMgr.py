@@ -63,7 +63,7 @@ class ConnectionMgr():
             halt.set()
         finally:
             await asyncio.gather(*self.tasks)
-            print('ConnectionMgr Shutdown...')
+            print('ConnectionMgr shut down...')
 
     def _update_connection_information(self):
         # Pickup new devices/updates from scanner:

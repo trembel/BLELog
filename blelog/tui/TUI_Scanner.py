@@ -7,8 +7,19 @@ from blelog.tui.TUI import TUIComponent
 
 
 class TUI_Scanner(TUIComponent):
-    def __init__(self, scnr: Scanner):
+    def __init__(self, scnr: Scanner, config):
         self.scnr = scnr
+
+        if config.plain_ascii_tui:
+            self.state_icon = {
+                SeenDeviceState.RECENTLY_SEEN: '',
+                SeenDeviceState.NOT_SEEN: '',
+            }
+        else:
+            self.state_icon = {
+                SeenDeviceState.RECENTLY_SEEN: '✅ ',
+                SeenDeviceState.NOT_SEEN: '❔ ',
+            }
 
     def get_lines(self) -> List[str]:
         scnr = self.scnr
@@ -18,7 +29,7 @@ class TUI_Scanner(TUIComponent):
         for d in scnr.seen_devices.values():
             name = d.get_name_repr()
             adr = d.adr
-            state = str(d.state)
+            state = self.state_icon[d.state] + str(d.state)
 
             if d.last_seen is not None:
                 t = round((time.monotonic_ns() - d.last_seen)/1e9, 2)
@@ -26,7 +37,7 @@ class TUI_Scanner(TUIComponent):
                 t = ''
 
             if d.state == SeenDeviceState.RECENTLY_SEEN and d.rssi is not None:
-                rssi = d.rssi
+                rssi = str(d.rssi)
             else:
                 rssi = ''
 

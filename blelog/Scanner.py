@@ -76,7 +76,7 @@ class Scanner():
             log.error('Scanner encountered an exception: %s' % str(e))
             halt.set()
         finally:
-            print('Scanner Shutdown...')
+            print('Scanner shut down...')
 
     def _update_seen_devices(self, devices: List[BLEDevice], t: int):
         for scanned_dev in devices:
@@ -86,8 +86,8 @@ class Scanner():
                 # Known device, update information:
                 dev = self.seen_devices[adr]
                 dev.last_seen = t
-                dev.name = dev.name
-                dev.rssi = dev.rssi
+                dev.name = scanned_dev.name
+                dev.rssi = scanned_dev.rssi
                 dev.state = SeenDeviceState.RECENTLY_SEEN
 
             else:

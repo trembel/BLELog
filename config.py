@@ -1,18 +1,20 @@
-from blelog.Configuration import Configuration, Characteristic
+from blelog.Configuration import Configuration, Characteristic, TUI_Mode
+from char_decoders import *
+
 config = Configuration(
     # ================== Scanner Settings ======================
     # Time, in seconds, a scan should last:
     # Very low scan times (even less than 1 or 2 seonds) work well under linux
     # Needs to be much higher under windows (30+)
-    scan_duration=2,
+    scan_duration=1.5,
 
     # Time, in seconds, to pause between scans:
-    scan_cooldown=2,
+    scan_cooldown=0.1,
 
     # Last-seen timeout:
     # Time (in seconds) that a device will be marked as 'recently_seen'
     # after being picked up by the scanner
-    seen_timeout=5,
+    seen_timeout=20,
 
     # ================ Connection Settings =====================
 
@@ -24,7 +26,7 @@ config = Configuration(
     connection_timeout_scan=20,
 
     # Maximum number of simultaneous Connections:
-    max_active_connections=4,
+    max_active_connections=2,
 
     # Maximum number of connections that can be established at the
     # same time:
@@ -38,7 +40,7 @@ config = Configuration(
 
     # Connect via address:
     connect_device_adrs=[
-        'E3:11:20:62:5D:3F',
+        # 'E3:11:20:62:5D:3F',
         'EB:E5:31:BF:2E:B5',
     ],
 
@@ -61,77 +63,89 @@ config = Configuration(
 
             # Timeout in seconds for this characteristics.:
             # Set to 'None' to disable.
-            timeout=5,
+            timeout=1.5,
+
+            column_headers=['index', 'ppg red'],
 
             # The data decoder function.
-            # Produces a list of values from the received bytearry
-            data_decoder=lambda x: x
+            # Produces a list data-collumn from the received bytearray
+            data_decoder=decode_ppg
         ),
 
         Characteristic(
             name='ppg_ir',
             uuid='182281a8-153a-11ec-82a8-0242ac130002',
-            timeout=None,
-            data_decoder=lambda x: x
+            timeout=1.5,
+            column_headers=['index', 'ppg ir'],
+            data_decoder=decode_ppg
         ),
 
         Characteristic(
             name='ppg_green',
             uuid='182281a8-153a-11ec-82a8-0242ac130003',
-            timeout=None,
-            data_decoder=lambda x: x
+            timeout=1.5,
+            column_headers=['index', 'ppg green'],
+            data_decoder=decode_ppg
         ),
 
-        # Characteristic(
-        #     name='temp',
-        #     uuid='18095c47-81d2-44e5-a350-aef131810001',
-        #     timeout=None,
-        #     data_decoder=lambda x: x
-        # ),
+        Characteristic(
+            name='temp',
+            uuid='18095c47-81d2-44e5-a350-aef131810001',
+            timeout=None,
+            column_headers=['index', 'temp'],
+            data_decoder=decode_temp
+        ),
 
-        # Characteristic(
-        #     name='qvar',
-        #     uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
-        #     timeout=None,
-        #     data_decoder=lambda x: x
-        # ),
+        Characteristic(
+            name='qvar',
+            uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
+            timeout=None,
+            column_headers=['index', 'qvar'],
+            data_decoder=decode_acc_gyr_qvar
+        ),
 
         Characteristic(
             name='acc_x',
             uuid='3da22dc6-70d7-4217-9bb2-de5d79560001',
             timeout=None,
-            data_decoder=lambda x: x
+            column_headers=['index', 'acc x'],
+            data_decoder=decode_acc_gyr_qvar
         ),
         Characteristic(
             name='acc_y',
             uuid='3da22dc6-70d7-4217-9bb2-de5d79560002',
             timeout=None,
-            data_decoder=lambda x: x
+            column_headers=['index', 'acc y'],
+            data_decoder=decode_acc_gyr_qvar
         ),
         Characteristic(
             name='acc_z',
             uuid='3da22dc6-70d7-4217-9bb2-de5d79560003',
             timeout=None,
-            data_decoder=lambda x: x
+            column_headers=['index', 'acc z'],
+            data_decoder=decode_acc_gyr_qvar
         ),
 
         Characteristic(
             name='gyro_x',
             uuid='3da22dc6-70d7-4217-9bb2-de5d79560011',
             timeout=None,
-            data_decoder=lambda x: x
+            column_headers=['index', 'gyro x'],
+            data_decoder=decode_acc_gyr_qvar
         ),
         Characteristic(
             name='gyro_y',
             uuid='3da22dc6-70d7-4217-9bb2-de5d79560012',
             timeout=None,
-            data_decoder=lambda x: x
+            column_headers=['index', 'gyro y'],
+            data_decoder=decode_acc_gyr_qvar
         ),
         Characteristic(
             name='gyro_z',
             uuid='3da22dc6-70d7-4217-9bb2-de5d79560013',
             timeout=None,
-            data_decoder=lambda x: x
+            column_headers=['index', 'gyro z'],
+            data_decoder=decode_acc_gyr_qvar
         )
     ],
 
@@ -156,6 +170,11 @@ config = Configuration(
     # Much less fun, much more compatible.
     plain_ascii_tui=False,
 
-    # Tui update Interval:
-    tui_interval=0.1
+    # TUI Mode:
+    # CURSE: Graphical Dashboard
+    # CONSOLE: log-only console ouput
+    tui_mode=TUI_Mode.CURSE,
+
+    # CURSE TUI update Interval:
+    curse_tui_interval=0.1
 )

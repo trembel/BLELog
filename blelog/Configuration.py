@@ -1,13 +1,21 @@
 from dataclasses import dataclass
 from typing import Callable, List, Dict, Union
 from blelog.Util import normalise_adr, normalise_char_uuid
+from enum import Enum
+import enum
 
+
+@enum.unique
+class TUI_Mode(Enum):
+    CURSE = 0
+    CONSOLE = 1
 
 @dataclass
 class Characteristic:
     name: str
     uuid: str
     timeout: Union[None, float]
+    column_headers: List[str]
     data_decoder: Callable
 
 
@@ -34,7 +42,8 @@ class Configuration:
     log_file: str
 
     plain_ascii_tui: bool
-    tui_interval: float
+    tui_mode: TUI_Mode
+    curse_tui_interval: float
 
     # consumers: List[Consumers]
 

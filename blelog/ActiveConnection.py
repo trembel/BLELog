@@ -42,14 +42,13 @@ class ActiveConnection:
 
         self.con = None  # type: Union[BleakClient, None]
 
-        self.inital_connection_time = None
+        self.initial_connection_time = None
         self.last_notif = {c.uuid: None for c in config.characteristics}  # type: Dict[str, Union[None, int]]
 
         self.log = logging.getLogger('log')
 
     async def run(self, halt: Event) -> None:
         log = logging.getLogger('log')
-
         try:
             con = BleakClient(
                 self.adr,
@@ -76,7 +75,7 @@ class ActiveConnection:
 
                     await self._check_for_timeout(con)
 
-                    await asyncio.sleep(0.2)
+                    await asyncio.sleep(0.02)
 
             except ActiveConnectionException:
                 pass
@@ -92,7 +91,7 @@ class ActiveConnection:
             halt.set()
         finally:
             if halt.is_set():
-                print('Connection %s Shutdown...' % self.name)
+                print('Connection %s shut down...' % self.name)
 
     async def _connect(self, con: BleakClient) -> None:
         log = logging.getLogger('log')
@@ -115,7 +114,7 @@ class ActiveConnection:
             log.warning('Failed to connect to %s: Timeout' % self.name)
             raise ActiveConnectionException()
 
-        log.info('Establieshed connected to %s!' % self.name)
+        log.info('Established connection to %s!' % self.name)
 
         # Enable notifications for all characteristics:
         for char in self.config.characteristics:
@@ -132,8 +131,8 @@ class ActiveConnection:
     async def _check_for_timeout(self, con: BleakClient) -> None:
         log = logging.getLogger('log')
 
-        if self.inital_connection_time is None:
-            self.inital_connection_time = time.monotonic_ns()
+        if self.initial_connection_time is None:
+            self.initial_connection_time = time.monotonic_ns()
 
         for char in self.config.characteristics:
             if char.timeout is not None:
@@ -155,7 +154,7 @@ class ActiveConnection:
 
                     # Check if initial timeout expired
                     timeout = char.timeout + self.config.initial_characterisitc_timeout
-                    has_been = (time.monotonic_ns() - self.inital_connection_time)/1e9
+                    has_been = (time.monotonic_ns() - self.initial_connection_time) / 1e9
 
                     if has_been > timeout:
                         log.warning('%s: Never receivied a notification for %s, disconnecting...' %
@@ -173,12 +172,15 @@ class ActiveConnection:
         self.last_notif[char.uuid] = time.monotonic_ns()
 
         # Decode and package data:
-        decoded_data = char.data_decoder(data)
-        result = NotifData(self.adr, self.name, char, decoded_data)
         try:
-            self.output.put_nowait(result)
-        except QueueFull:
-            self.log.error("%s failed to put data into queue!" % self.name)
+            decoded_data = char.data_decoder(data)
+            result = NotifData(self.adr, self.name, char, decoded_data)
+            try:
+                self.output.put_nowait(result)
+            except QueueFull:
+                self.log.error("%s failed to put data into queue!" % self.name)
+        except Exception as e:
+            self.log.error("Decoder for %s raised an exception: %s" % (char.name, str(e)))
 
     async def do_disconnect(self) -> None:
         if self.con is not None:
