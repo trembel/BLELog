@@ -1,0 +1,17 @@
+{
+    "configurations": {
+        "Run": {
+            "adapter": "debugpy",
+            "filetypes": [
+                "python"
+            ],
+            "configuration": {
+                "request": "launch",
+                "program": "robust_log.py",
+                "args": [
+                ],
+                "stopOnEntry": true
+            }
+        }
+    }
+}
