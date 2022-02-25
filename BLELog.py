@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from asyncio.queues import Queue
 import logging
 from logging import FileHandler, StreamHandler
 import sys
@@ -54,15 +55,16 @@ async def main():
     err_handler.setLevel(logging.ERROR)
     log.addHandler(err_handler)
 
-    # Create Data Consumers and Consumer Manager:
-    consume_log2csv = None
-    consume_mgr = ConsumerMgr([consume_log2csv], configuration)
+    # Create Data Consumers and Consumer Manager: # TODO DEBUG
+    # consume_log2csv = None
+    # consume_mgr = ConsumerMgr([consume_log2csv], configuration)
 
     # Create the scanner:
     scnr = Scanner(config=configuration)
 
     # Create the connection manager:
-    con_mgr = ConnectionMgr(configuration, scnr, consume_mgr.input)
+    void = Queue()  # TODO DEBUG
+    con_mgr = ConnectionMgr(configuration, scnr, void)
 
     # Create the TUI:
     tui_scanner = TUI_Scanner(scnr)
@@ -81,9 +83,10 @@ async def main():
         scnr_task = asyncio.create_task(scnr.run(halt_event))
         con_mgr_task = asyncio.create_task(con_mgr.run(halt_event))
         tui_task = asyncio.create_task(tui.run(halt_event))
-        consume_mgr_task = asyncio.create_task(consume_mgr.run(halt_event))
-
-        await asyncio.gather(scnr_task, con_mgr_task, tui_task, consume_mgr_task)
+        # consume_mgr_task = asyncio.create_task(consume_mgr.run(halt_event)) # TODO DEBUG
+        
+        await asyncio.gather(scnr_task, con_mgr_task, tui_task)
+        # await asyncio.gather(scnr_task, con_mgr_task, tui_task, consume_mgr_task) # TODO DEBUG
     except KeyboardInterrupt:
         print('Interrupted!')
 
