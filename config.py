@@ -40,7 +40,7 @@ config = Configuration(
 
     # Connect via address:
     connect_device_adrs=[
-        # 'E3:11:20:62:5D:3F',
+        'E3:11:20:62:5D:3F',
         'EB:E5:31:BF:2E:B5',
     ],
 
@@ -63,7 +63,7 @@ config = Configuration(
 
             # Timeout in seconds for this characteristics.:
             # Set to 'None' to disable.
-            timeout=1.5,
+            timeout=3,
 
             column_headers=['index', 'ppg red'],
 
@@ -75,7 +75,7 @@ config = Configuration(
         Characteristic(
             name='ppg_ir',
             uuid='182281a8-153a-11ec-82a8-0242ac130002',
-            timeout=1.5,
+            timeout=3,
             column_headers=['index', 'ppg ir'],
             data_decoder=decode_ppg
         ),
@@ -83,26 +83,26 @@ config = Configuration(
         Characteristic(
             name='ppg_green',
             uuid='182281a8-153a-11ec-82a8-0242ac130003',
-            timeout=1.5,
+            timeout=3,
             column_headers=['index', 'ppg green'],
             data_decoder=decode_ppg
         ),
 
-        Characteristic(
-            name='temp',
-            uuid='18095c47-81d2-44e5-a350-aef131810001',
-            timeout=None,
-            column_headers=['index', 'temp'],
-            data_decoder=decode_temp
-        ),
+        # Characteristic(
+        #     name='temp',
+        #     uuid='18095c47-81d2-44e5-a350-aef131810001',
+        #     timeout=None,
+        #     column_headers=['index', 'temp'],
+        #     data_decoder=decode_temp
+        # ),
 
-        Characteristic(
-            name='qvar',
-            uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
-            timeout=None,
-            column_headers=['index', 'qvar'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
+        # Characteristic(
+        #     name='qvar',
+        #     uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
+        #     timeout=None,
+        #     column_headers=['index', 'qvar'],
+        #     data_decoder=decode_acc_gyr_qvar
+        # ),
 
         Characteristic(
             name='acc_x',

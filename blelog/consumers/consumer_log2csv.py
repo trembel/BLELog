@@ -54,16 +54,17 @@ class CSVLogger:
 
 class Consumer_log2csv(Consumer):
     def __init__(self, config: Configuration):
+        super().__init__()
         self.config = config
 
-    async def run(self, halt: Event, input_q: Queue):
+    async def run(self, halt: Event):
         log = logging.getLogger('log')
         file_outputs = {}
         tasks = []
         try:
             while not halt.is_set():
                 try:
-                    next_data = await asyncio.wait_for(input_q.get(), timeout=0.5)  # type: NotifData
+                    next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)  # type: NotifData
                     file_path = self.file_path(next_data.device_adr, next_data.characteristic)
                     if file_path not in file_outputs:
                         file_outputs[file_path] = CSVLogger(file_path, next_data.characteristic.column_headers)
