@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-from asyncio.queues import Queue
-import logging
-from logging import FileHandler, StreamHandler
-import sys
 import asyncio
+import logging
+import signal
+import sys
 from asyncio import Event
+from asyncio.queues import Queue
+from logging import FileHandler, StreamHandler
 
+import config
 from blelog.ConnectionMgr import ConnectionMgr
-from blelog.Scanner import Scanner
-from blelog.consumers.ConsumerMgr import ConsumerMgr
 from blelog.consumers.consumer_log2csv import Consumer_log2csv
+from blelog.consumers.ConsumerMgr import ConsumerMgr
+from blelog.Scanner import Scanner
 from blelog.tui.TUI import TUI
 from blelog.tui.TUI_Connections import TUI_Connections
 from blelog.tui.TUI_Log import TUI_Log
 from blelog.tui.TUI_Scanner import TUI_Scanner
-
-import config
-
-import signal
 
 
 async def main():
@@ -81,6 +79,7 @@ async def main():
             sys.exit(-1)
 
     signal.signal(signal.SIGINT, halt_hndlr)
+    tui.set_halt_handler(halt_hndlr)
 
     # Startup:
     log.info('Starting!')

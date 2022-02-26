@@ -1,13 +1,13 @@
+import asyncio
+import curses
+import logging
 from abc import ABC, abstractmethod
+from asyncio import Event
 from asyncio.queues import Queue
 from collections import deque
-import logging
 from typing import List
-import asyncio
-from asyncio import Event
 
 from blelog.Configuration import Configuration, TUI_Mode
-import curses
 
 
 class LogHandler(logging.Handler):
@@ -47,9 +47,13 @@ class TUI:
         self.curse_stdscr = None
         self.cures_is_initialised = False
         self.curse_is_shutoff = False
+        self.halt_hndlr = None
 
     def add_component(self, c: TUIComponent) -> None:
         self.components.append(c)
+
+    def set_halt_handler(self, hndlr) -> None:
+        self.halt_hndlr = hndlr
 
     async def run(self, halt: Event) -> None:
         if self.config.tui_mode == TUI_Mode.CURSE:
@@ -115,6 +119,14 @@ class TUI:
                 for i, line in enumerate(lines):
                     stdscr.addstr(i, 0, line)
                 stdscr.refresh()
+
+                # Handle input
+                # Needed under windows to catch CTRL-C
+                stdscr.nodelay(True)
+                c = stdscr.getch()
+                if c == 3:
+                    if self.halt_hndlr is not None:
+                        self.halt_hndlr()
 
                 await asyncio.sleep(self.config.curse_tui_interval)
         except Exception as e:
