@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from asyncio import Event
 from asyncio.queues import Queue
 from collections import deque
-from typing import List
+from typing import Callable, List
 
 from blelog.Configuration import Configuration, TUI_Mode
 
@@ -128,6 +128,10 @@ class TUI:
                     if self.halt_hndlr is not None:
                         self.halt_hndlr()
 
+                if c == 'g' or c == 'G':
+                    if self.plot_toggle is not None:
+                        self.plot_toggle()
+
                 await asyncio.sleep(self.config.curse_tui_interval)
         except Exception as e:
             log.error('TUI encountered an exception: %s' % str(e))
@@ -144,3 +148,6 @@ class TUI:
             curses.echo()
             curses.endwin()
             self.curse_is_shutoff = True
+
+    def set_plot_toggle(self, plot_toggle: Callable):
+        self.plot_toggle = plot_toggle

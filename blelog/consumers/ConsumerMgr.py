@@ -38,11 +38,14 @@ class NotifData:
 
 
 class ConsumerMgr:
-    def __init__(self, consumers: List[Consumer], config: Configuration) -> None:
+    def __init__(self, config: Configuration) -> None:
         self.config = config
-        self.consumers = consumers
+        self.consumers = []  # type: List[Consumer]
         self.consumer_tasks = []
         self.input_q = Queue()
+
+    def add_consumer(self, c: Consumer):
+        self.consumers.append(c)
 
     async def run(self, halt: Event) -> None:
         log = logging.getLogger('log')
@@ -61,7 +64,7 @@ class ConsumerMgr:
                             consumer.input_q.put_nowait(next_data)
                         except QueueFull:
                             log.warning('Consumer %s did not accept data!' % type(consumer).__name__)
-                        self.input_q.task_done()
+                    self.input_q.task_done()
 
                     # Check if any consumers are lagging behind:
                     for consumer in self.consumers:

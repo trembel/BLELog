@@ -4,12 +4,12 @@ import logging
 import signal
 import sys
 from asyncio import Event
-from asyncio.queues import Queue
 from logging import FileHandler, StreamHandler
 
 import config
 from blelog.ConnectionMgr import ConnectionMgr
 from blelog.consumers.consumer_log2csv import Consumer_log2csv
+from blelog.consumers.consumer_plotter import Consumer_plotter
 from blelog.consumers.ConsumerMgr import ConsumerMgr
 from blelog.Scanner import Scanner
 from blelog.tui.TUI import TUI
@@ -41,7 +41,11 @@ async def main():
 
     # Create Data Consumers and Consumer Manager:
     consume_log2csv = Consumer_log2csv(configuration)
-    consume_mgr = ConsumerMgr([consume_log2csv], configuration)
+    consume_plot = Consumer_plotter(configuration)
+
+    consume_mgr = ConsumerMgr(configuration)
+    consume_mgr.add_consumer(consume_log2csv)
+    consume_mgr.add_consumer(consume_plot)
 
     # Create the scanner:
     scnr = Scanner(config=configuration)
@@ -58,6 +62,8 @@ async def main():
     tui.add_component(tui_conns)
     tui_log = TUI_Log(configuration)
     tui.add_component(tui_log)
+
+    tui.set_plot_toggle(consume_plot.toggle_on_off)
 
     # Re-route SIGINT (Interruption, i.e. due to CTRL-C) to a handler to
     # allow cleanup:
@@ -89,6 +95,8 @@ async def main():
     con_mgr_task = asyncio.create_task(con_mgr.run(halt_event))
     tui_task = asyncio.create_task(tui.run(halt_event))
     consume_mgr_task = asyncio.create_task(consume_mgr.run(halt_event))
+
+    consume_plot.toggle_on_off()
 
     await asyncio.gather(scnr_task, con_mgr_task, tui_task, consume_mgr_task)
 

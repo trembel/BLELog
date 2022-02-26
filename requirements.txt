@@ -2,3 +2,5 @@ bleak==0.14.2
 tabulate==0.8.9
 wcwidth==0.2.5
 aiofiles==0.6.0
+matplotlib==3.5.1
+numpy==1.22.2
