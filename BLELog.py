@@ -3,20 +3,18 @@ import logging
 import signal
 import sys
 from asyncio import Event
-from logging import FileHandler, StreamHandler
 
+import blelog.Logging as Logging
 import config
 from blelog.ConnectionMgr import ConnectionMgr
-from blelog.Scanner import Scanner
-from blelog.TUI import TUI
 from blelog.ConsumerMgr import ConsumerMgr
-
 from blelog.consumers.log2csv import Consumer_log2csv
 from blelog.consumers.plotter import Consumer_plotter
-
 from blelog.curses_tui_components.Connections_TUI import Connections_TUI
 from blelog.curses_tui_components.Log_TUI import Log_TUI
 from blelog.curses_tui_components.Scanner_TUI import Scanner_TUI
+from blelog.Scanner import Scanner
+from blelog.TUI import TUI
 
 
 async def main():
@@ -25,20 +23,7 @@ async def main():
     configuration.normalise()
 
     # Setup log:
-    log = logging.getLogger('log')
-    log.setLevel(logging.INFO)
-
-    # Setup status log file output:
-    if configuration.log_file is not None:
-        file_handler = FileHandler(configuration.log_file)
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-        log.addHandler(file_handler)
-
-    # Add streamhandler to print ERROR messages to stderr:
-    err_handler = StreamHandler(sys.stderr)
-    err_handler.setLevel(logging.ERROR)
-    log.addHandler(err_handler)
+    Logging.setup_logging(configuration)
 
     # Create Data Consumers and Consumer Manager:
     consume_mgr = ConsumerMgr(configuration)
@@ -98,7 +83,7 @@ async def main():
     tui_task = asyncio.create_task(tui.run(halt_event))
     consume_mgr_task = asyncio.create_task(consume_mgr.run(halt_event))
 
-    log.info('Starting!')
+    logging.getLogger('log').info('Starting!')
 
     await asyncio.gather(scnr_task, con_mgr_task, tui_task, consume_mgr_task)
 

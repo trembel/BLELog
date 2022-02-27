@@ -1,13 +1,20 @@
-from collections import deque
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from blelog.ConsumerMgr import NotifData
-from blelog.Util import normalise_adr
+import logging
 import multiprocessing as mp
 import queue
+from collections import deque
+
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+from blelog.ConsumerMgr import NotifData
+from blelog.Util import normalise_adr
 
 
 def plot(data_queue: mp.Queue):
+    # If you want to print anything, don't use print.
+    # Use this logger:
+    log = logging.getLogger('log')
+    # log.info('Helllooooooo wooooorld!')
 
     # To keep things simple, let's only plot data from a specific device
     # Note: normalise_adr makes sure the address is in the same format

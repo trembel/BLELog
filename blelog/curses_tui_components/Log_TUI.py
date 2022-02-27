@@ -36,7 +36,7 @@ class Log_TUI(CursesTUI_Component):
         lines = []
         for record in self.q:
             icon = self.icon[record.levelname]
-            lines.append(icon + "  " + record.msg)
+            lines.append(icon + "  " + record.getMessage())
         return lines
 
     def title(self) -> str:

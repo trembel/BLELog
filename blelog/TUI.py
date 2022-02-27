@@ -88,7 +88,7 @@ class TUI:
             while not halt.is_set():
                 try:
                     i = await asyncio.wait_for(self.console_q.get(), timeout=0.5)
-                    print(icons[i.levelname] + ' ' + i.msg)
+                    print(icons[i.levelname] + ' ' + i.getMessage())
                 except asyncio.TimeoutError:
                     pass
 
@@ -125,8 +125,19 @@ class TUI:
 
                 # Draw to screen
                 stdscr.clear()
+                max_rows, max_cols = stdscr.getmaxyx()
+
                 for i, line in enumerate(lines):
+                    if i >= max_rows:
+                        break
+
+                    # strip newlines:
+                    line = line.replace('\n', '').replace('\r', '')
+
+                    # truncate line:
+                    line = (line[:max_cols-5] + '...') if len(line) > max_cols-5 else line
                     stdscr.addstr(i, 0, line)
+
                 stdscr.refresh()
 
                 # Handle input

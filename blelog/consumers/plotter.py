@@ -1,13 +1,14 @@
 import asyncio
-from asyncio.locks import Event
 import logging
-import signal
 import multiprocessing as mp
 import queue
+import signal
+from asyncio.locks import Event
+from logging import LogRecord
+from logging.handlers import QueueHandler
 
 from blelog.Configuration import Configuration
 from blelog.ConsumerMgr import Consumer, NotifData
-
 from plot import plot
 
 
@@ -15,16 +16,28 @@ class PlottingProcess(mp.Process):
     def __init__(self) -> None:
         super().__init__()
         self.input_q = mp.Queue()
-        self.err_q = mp.Queue()
+        self.log_q = mp.Queue()
 
     def run(self) -> None:
         # Ignore interrupt signals in the plotting process,
         # BLELog will take care of closing the process:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+        # Setup logging:
+        # Reroute 'log' and warnings to output queue:
+        log = logging.getLogger('log')
+        log.setLevel(logging.DEBUG)
+        log.addHandler(QueueHandler(self.log_q))
+
+        logging.captureWarnings(True)
+        log_warn = logging.getLogger('py.warnings')
+        log_warn.setLevel(logging.WARNING)
+        log_warn.addHandler(QueueHandler(self.log_q))
+
         try:
             plot(self.input_q)
         except Exception as e:
-            self.err_q.put(str(e))
+            self.log_q.put(str(e))
 
 
 class Consumer_plotter(Consumer):
@@ -47,6 +60,7 @@ class Consumer_plotter(Consumer):
             while not halt.is_set():
                 self._monitor_plotter_process(halt)
                 self._open_close_plotter()
+                self._grab_logs()
                 await self._stream_data()
 
         except Exception as e:
@@ -62,13 +76,7 @@ class Consumer_plotter(Consumer):
 
         if self.plotting_process is not None and not self.plotting_process.is_alive():
             # Look for and print any messages placed into the error queue:
-            while True:
-                try:
-                    msg = self.plotting_process.err_q.get_nowait()  # type: str
-                    log.error('plot.py raised an exception: %s' % msg)
-                    break
-                except queue.Empty:
-                    break
+            self._grab_logs()
 
             log.info('Plotter GUI closed.')
             self.plotting_process = None
@@ -90,6 +98,7 @@ class Consumer_plotter(Consumer):
                 self.plotting_process.start()
                 log.info('Opened plotter GUI.')
             else:
+                self._grab_logs()
                 self.plotting_process.kill()
                 self.plotting_process = None
                 log.info('Closed plotter GUI.')
@@ -117,6 +126,16 @@ class Consumer_plotter(Consumer):
 
         except asyncio.TimeoutError:
             pass
+
+    def _grab_logs(self):
+        log = logging.getLogger('log')
+        if self.plotting_process is not None:
+            while True:
+                try:
+                    record = self.plotting_process.log_q.get_nowait()  # type: LogRecord
+                    log.log(record.levelno, record.getMessage())
+                except queue.Empty:
+                    break
 
     def toggle_on_off(self):
         self.do_toggle_on_off = True
