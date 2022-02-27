@@ -1,3 +1,11 @@
+"""
+blelog/curses_tui_components/Connections_TUI.py
+'Connections' Section of the curses dashboard.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 from typing import List
 import tabulate
 import time

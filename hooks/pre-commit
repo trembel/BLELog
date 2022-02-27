@@ -10,7 +10,7 @@ then
     echo "autopep8: Python formatting OK!"
     exit 0
 else
-    echo "autopep8: Error! Pyhon not formatted. Run hooks/format_all.sh!"  
+    echo "autopep8: Error! Python not formatted. Run hooks/format_all.sh!"
     exit 1
 fi
 

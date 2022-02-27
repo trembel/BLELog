@@ -1,3 +1,12 @@
+"""
+blelog/ConsumerMgr.py
+Receives all data from all connections, and distributes it to all data consumers.
+(CSV Logging, Live plotting..)
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 from abc import ABC, abstractmethod
 from asyncio.queues import QueueFull
 from dataclasses import dataclass
@@ -14,6 +23,10 @@ warn_timeout_ns = 60e9
 
 
 class Consumer(ABC):
+    """
+    Basic interface for a data consumer.
+    """
+
     def __init__(self) -> None:
         self.input_q = Queue()
         self.last_full_queue_warning = None  # type: Union[int, None]

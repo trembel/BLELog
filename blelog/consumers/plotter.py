@@ -1,3 +1,15 @@
+"""
+blelog/consumers/plotter.py
+Data consumer that displays data in a live plot
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+
+Matplotlib plot is defined in plot.py.
+plot.py runs in its own process - see plot.py for details.
+"""
+
 import asyncio
 import logging
 import multiprocessing as mp
@@ -89,7 +101,7 @@ class Consumer_plotter(Consumer):
     def _open_close_plotter(self):
         log = logging.getLogger('log')
 
-        # Check if toogling the plot was requested:
+        # Check if toggling the plot was requested:
         if self.do_toggle_on_off:
             self.do_toggle_on_off = False
 
@@ -122,7 +134,7 @@ class Consumer_plotter(Consumer):
                         await asyncio.sleep(0.05)
                 else:
                     # Failed to put into queue 10 times, log and move on:
-                    log.warn('Consumer Plotter: Failed to pass data to logging process!')
+                    log.warning('Consumer Plotter: Failed to pass data to logging process!')
 
         except asyncio.TimeoutError:
             pass

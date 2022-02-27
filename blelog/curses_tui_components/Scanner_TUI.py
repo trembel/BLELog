@@ -1,3 +1,11 @@
+"""
+blelog/curses_tui_components/Scanner_TUI.py
+'Scanner' Section of the curses dashboard.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 import tabulate
 import time
 from typing import List

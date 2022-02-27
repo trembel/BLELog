@@ -1,3 +1,12 @@
+"""
+BLELog.py
+A (hopefully) robust BLE Datalogger, that receives, decodes, stores and 
+displays characteristic data.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 import asyncio
 import logging
 import signal
@@ -17,10 +26,11 @@ from blelog.Scanner import Scanner
 from blelog.TUI import TUI
 
 
+# noinspection SpellCheckingInspection
 async def main():
     # Grab configuration from config.py and clean it up:
     configuration = config.config
-    configuration.normalise()
+    configuration.validate_and_normalise()
 
     # Setup log:
     Logging.setup_logging(configuration)
@@ -60,13 +70,14 @@ async def main():
 
     def halt_hndlr(*_):
         # Set halt event
-        print('\r\n[%i] Interrupted! Shutting down... This may take a few seconds. Interrupt 3 times to panic abort.\r\n' % panic_count[0])
+        print('\r\n[%i] Interrupted! Shutting down... This may take a few seconds. '
+              'Interrupt 3 times to panic abort.\r\n' % panic_count[0])
         halt_event.set()
 
-        # immediatly turn of TUI:
+        # immediately turn of TUI:
         tui.off()
 
-        # If this happends 3 times, kill the program:
+        # If this happens 3 times, kill the program:
         panic_count[0] += 1
         if panic_count[0] >= 3:
             print('[Panic Abort]')

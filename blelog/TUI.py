@@ -1,3 +1,12 @@
+"""
+blelog/TUI.py
+Runs the CURSES or CONSOLE TUI.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
+
 import asyncio
 import curses
 import logging
@@ -43,11 +52,15 @@ class CursesTUI_Component(ABC):
 class TUI:
     def __init__(self, config: Configuration) -> None:
         self.config = config
+        self.halt_hndlr = None
+
+        # Curses:
         self.components = []
         self.curse_stdscr = None
         self.cures_is_initialised = False
         self.curse_is_shutoff = False
-        self.halt_hndlr = None
+        self.plot_toggle = None
+
         # Setup log handler for CONSOLE mode:
         self.console_q = Queue()
         self.console_lh = AsyncLogHandler(self.console_q)

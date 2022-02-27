@@ -1,3 +1,12 @@
+"""
+blelog/Scanner.py
+Repeatedly scans for new devices.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
+
 from typing import Union, List, Dict
 import time
 from dataclasses import dataclass
@@ -42,7 +51,7 @@ class SeenDevice:
         return self.adr
 
 
-class Scanner():
+class Scanner:
     def __init__(self, config: Configuration):
         self.config = config
 

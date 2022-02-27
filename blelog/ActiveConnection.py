@@ -1,3 +1,11 @@
+"""
+blelog/ActiveConnection.py
+A single connection to a specific device. Managed by ConnectionMgr
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 from asyncio.queues import Queue, QueueFull
 import functools
 import time
@@ -68,7 +76,7 @@ class ActiveConnection:
 
                 while not halt.is_set():
                     # Check for disconnection
-                    # (Flag set by disconnect callback or when this connection is manully disconnected)
+                    # (Flag set by disconnect callback or when this connection is manually disconnected)
                     if self.did_disconnect:
                         log.warning('Connection to %s lost!' % self.name)
                         raise ActiveConnectionException()
@@ -96,7 +104,7 @@ class ActiveConnection:
     async def _connect(self, con: BleakClient) -> None:
         log = logging.getLogger('log')
 
-        # Note: According to the docks, bleak generates exceptions if connecting failes under linux,
+        # Note: According to the docks, bleak generates exceptions if connecting fails under linux,
         # while only returning false on other platforms.
         # This should handle all cases.
         try:
@@ -150,14 +158,14 @@ class ActiveConnection:
                         log.warning('Disconnected from %s.' % self.name)
                         raise ActiveConnectionException()
 
-                elif self.config.initial_characterisitc_timeout is not None:
+                elif self.config.initial_characteristic_timeout is not None:
 
                     # Check if initial timeout expired
-                    timeout = char.timeout + self.config.initial_characterisitc_timeout
+                    timeout = char.timeout + self.config.initial_characteristic_timeout
                     has_been = (time.monotonic_ns() - self.initial_connection_time) / 1e9
 
                     if has_been > timeout:
-                        log.warning('%s: Never receivied a notification for %s, disconnecting...' %
+                        log.warning('%s: Never received a notification for %s, disconnecting...' %
                                     (self.name, char.name))
                         await con.disconnect()
                         log.warning('Disconnected from %s.' % self.name)

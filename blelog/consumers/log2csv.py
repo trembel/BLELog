@@ -1,3 +1,11 @@
+"""
+blelog/consumers/log2csv.py
+Data consumer that writes data to CSV files.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 import asyncio
 from asyncio.locks import Event
 from asyncio.queues import Queue

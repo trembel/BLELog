@@ -1,3 +1,11 @@
+"""
+blelog/curses_tui_components/Log_TUI.py
+'Log' Section of the curses dashboard.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 from collections import deque
 import logging
 from typing import List

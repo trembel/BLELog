@@ -1,3 +1,11 @@
+"""
+blelog/ConnectionMgr.py
+Monitors connection statuses, and attempts to create new connections when possible.
+
+BLELog - Philipp Schilk, 2022
+PBL, ETH Zuerich
+---------------------------------
+"""
 from asyncio.queues import Queue
 import logging
 import asyncio
@@ -12,7 +20,7 @@ from blelog.Scanner import Scanner, SeenDevice, SeenDeviceState
 
 
 @dataclass
-class ManagedConnection():
+class ManagedConnection:
     last_connection_attempt: Union[int, None]
     scanner_information: SeenDevice
     active_connection: Union[None, ActiveConnection]
@@ -41,7 +49,7 @@ class ManagedConnection():
             return self.last_connection_attempt < other.last_connection_attempt
 
 
-class ConnectionMgr():
+class ConnectionMgr:
     def __init__(self, config: Configuration, scnr: Scanner, output_queue: Queue):
         self.config = config
         self.scnr = scnr
@@ -58,7 +66,7 @@ class ConnectionMgr():
                 await asyncio.sleep(self.config.mgr_interval)
 
         except Exception as e:
-            log.error('ConnectiongMgr encountered an exception: %s' % str(e))
+            log.error('ConnectionMgr encountered an exception: %s' % str(e))
             halt.set()
         finally:
             await asyncio.gather(*self.tasks)
@@ -98,7 +106,7 @@ class ConnectionMgr():
 
         # If there is space for more connections, spawn one:
         if active_connection_count < self.config.max_active_connections:
-            if connecting_connection_count < self.config.max_simulatneous_connection_attempts:
+            if connecting_connection_count < self.config.max_simultaneous_connection_attempts:
                 # First, find all possible connections:
                 possible_connections = [c for c in self.connections.values() if c.ready_to_connect()]
 
