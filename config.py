@@ -149,16 +149,36 @@ config = Configuration(
         )
     ],
 
-
     # Initial Characteristic Timeout:
     # An additional amount of time (in seconds) allowed in addition to the
     # Characteristic timeout for the first notification.
     initial_characterisitc_timeout=10,
 
     # Manager Interval:
-    # Time in seconds, between connection manager running and
-    # possibly attempting to create new connections
+    # Time in seconds between connection manager attempting to
+    # create new connections
     mgr_interval=1,
+
+
+    # ================== Consumer Settings ======================
+
+    # Enable/disable logging of data to CSV files:
+    log2csv_enabled=True,
+
+    # CSV ouput folder name:
+    # IMPORTANT: Make sure this folder exists, BLElog will
+    # not attempt to create it!
+    log2csv_folder_name="output_csv",
+
+    # Automatically open the data plot GUI on startup:
+    # Usefull in 'CONSOLE' tui mode, as the plotter cannot
+    # be manually opened.
+    plotter_open_by_default=True,
+
+    # Shut down BLElog when the plot GUI is closed:
+    # Not recomended. This will stop BLElog if plotting fails
+    # for any reason. Usefull during testing/in CONSOLE mode.
+    plotter_exit_on_plot_close=False,
 
     # ================== General Settings ======================
 

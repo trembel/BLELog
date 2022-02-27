@@ -48,6 +48,11 @@ class TUI:
         self.cures_is_initialised = False
         self.curse_is_shutoff = False
         self.halt_hndlr = None
+        # Setup log handler for CONSOLE mode:
+        self.console_q = Queue()
+        self.console_lh = AsyncLogHandler(self.console_q)
+        self.console_lh.setLevel(logging.INFO)
+        logging.getLogger('log').addHandler(self.console_lh)
 
     def add_component(self, c: TUIComponent) -> None:
         self.components.append(c)
@@ -64,10 +69,6 @@ class TUI:
     async def run_console(self, halt: Event) -> None:
         log = logging.getLogger('log')
         try:
-            q = Queue()
-            lh = AsyncLogHandler(q)
-            lh.setLevel(logging.INFO)
-            log.addHandler(lh)
 
             if self.config.plain_ascii_tui:
                 icons = {
@@ -82,9 +83,11 @@ class TUI:
                     'ERROR': '‼️'
                 }
 
+            print("==== BLELOG ====")
+
             while not halt.is_set():
                 try:
-                    i = await asyncio.wait_for(q.get(), timeout=0.5)
+                    i = await asyncio.wait_for(self.console_q.get(), timeout=0.5)
                     print(icons[i.levelname] + ' ' + i.msg)
                 except asyncio.TimeoutError:
                     pass
@@ -108,6 +111,10 @@ class TUI:
             while not halt.is_set():
                 # Get lines from each TUI component:
                 lines = []
+                lines.append('========== BLELOG =========')
+                lines.append('')
+                lines.append('Press \'g\' to toggle gui plotter!')
+                lines.append('')
                 for c in self.components:
                     lines.append('========== %s =========' % c.title())
                     lines.append('')
@@ -128,7 +135,7 @@ class TUI:
                     if self.halt_hndlr is not None:
                         self.halt_hndlr()
 
-                if c == 'g' or c == 'G':
+                if c == ord('G') or c == ord('g'):
                     if self.plot_toggle is not None:
                         self.plot_toggle()
 

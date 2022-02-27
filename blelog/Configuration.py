@@ -10,6 +10,7 @@ class TUI_Mode(Enum):
     CURSE = 0
     CONSOLE = 1
 
+
 @dataclass
 class Characteristic:
     name: str
@@ -38,6 +39,12 @@ class Configuration:
     initial_characterisitc_timeout: float
 
     mgr_interval: float
+
+    log2csv_enabled: bool
+    log2csv_folder_name: str
+
+    plotter_open_by_default: bool
+    plotter_exit_on_plot_close: bool
 
     log_file: str
 

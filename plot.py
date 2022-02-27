@@ -14,9 +14,12 @@ def plot(data_queue: mp.Queue):
     # used in blelog
     device_adr = normalise_adr('EB:E5:31:BF:2E:B5')
 
+    # Setup plot with 5 suplots:
     fig1, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(5)
     axs = [ax1, ax2, ax3, ax4, ax5]
 
+    # Setup deques to hold data for each characterisitc:
+    # 'maxlen' controls the maximum number of datapoints shown.
     data_dqs = {
         'ppg_red': deque(maxlen=300),
         'ppg_ir': deque(maxlen=300),
@@ -34,6 +37,9 @@ def plot(data_queue: mp.Queue):
         'gyro_z': deque(maxlen=300)
     }
 
+    # Animation function called repeatedly by matplotlib.
+    # Grabs data from the input queues and pushes it to the correct
+    # deque before updating the plot.
     def animate(_):
         # Grab as much data from the input queue as possible:
         while True:
@@ -55,6 +61,7 @@ def plot(data_queue: mp.Queue):
             except queue.Empty:
                 break
 
+        # Clear
         for ax in axs:
             ax.clear()
 
@@ -64,6 +71,7 @@ def plot(data_queue: mp.Queue):
         ax4.set_title("QVAR")
         ax5.set_title("Temperature")
 
+        # set data
         ax1.plot(data_dqs['ppg_red'], linewidth=0.5, label="red")
         # ax1.plot(data_dqs['ppg_ir'], linewidth=0.5, label="ir")
         # ax1.plot(data_dqs['ppg_green'], linewidth=0.5, label="green")
@@ -85,5 +93,6 @@ def plot(data_queue: mp.Queue):
 
         fig1.tight_layout()
 
-    _ = FuncAnimation(fig1, animate, interval=100)
+    # Start plot
+    _ = FuncAnimation(fig1, animate)
     plt.show()

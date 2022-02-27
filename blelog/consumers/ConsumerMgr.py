@@ -54,6 +54,7 @@ class ConsumerMgr:
             for consumer in self.consumers:
                 tsk = asyncio.create_task(consumer.run(halt))
                 self.consumer_tasks.append(tsk)
+                log.info('Consumer %s enabled!' % consumer.__class__.__name__)
 
             while not halt.is_set():
                 try:

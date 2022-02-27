@@ -40,11 +40,13 @@ async def main():
     log.addHandler(err_handler)
 
     # Create Data Consumers and Consumer Manager:
-    consume_log2csv = Consumer_log2csv(configuration)
-    consume_plot = Consumer_plotter(configuration)
-
     consume_mgr = ConsumerMgr(configuration)
-    consume_mgr.add_consumer(consume_log2csv)
+
+    if configuration.log2csv_enabled:
+        consume_log2csv = Consumer_log2csv(configuration)
+        consume_mgr.add_consumer(consume_log2csv)
+
+    consume_plot = Consumer_plotter(configuration)
     consume_mgr.add_consumer(consume_plot)
 
     # Create the scanner:
@@ -72,7 +74,7 @@ async def main():
 
     def halt_hndlr(*_):
         # Set halt event
-        print('\r\n [%i] Interrupted! Shutting down... This may take a few seconds..\r\n' % panic_count[0])
+        print('\r\n[%i] Interrupted! Shutting down... This may take a few seconds. Interrupt 3 times to panic abort.\r\n' % panic_count[0])
         halt_event.set()
 
         # immediatly turn of TUI:
@@ -88,7 +90,6 @@ async def main():
     tui.set_halt_handler(halt_hndlr)
 
     # Startup:
-    log.info('Starting!')
 
     # Run the logger, scanner, tui, and consumer manager:
     scnr_task = asyncio.create_task(scnr.run(halt_event))
@@ -96,7 +97,7 @@ async def main():
     tui_task = asyncio.create_task(tui.run(halt_event))
     consume_mgr_task = asyncio.create_task(consume_mgr.run(halt_event))
 
-    consume_plot.toggle_on_off()
+    log.info('Starting!')
 
     await asyncio.gather(scnr_task, con_mgr_task, tui_task, consume_mgr_task)
 

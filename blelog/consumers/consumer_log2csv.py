@@ -17,10 +17,12 @@ class CSVLogger:
         self.file_path = file_path
         self.input_q = Queue()
         self.column_headers = column_headers
+        self.active = True
 
     async def run(self, halt: Event):
         log = logging.getLogger('log')
         f = None
+
         try:
             if os.path.exists(self.file_path):
                 f = await aiofiles.open(self.file_path, 'a', newline='')
@@ -37,10 +39,13 @@ class CSVLogger:
                         await self.write_row(f, row)
                 except asyncio.TimeoutError:
                     pass
+        except FileNotFoundError as e:
+            log.error('CSVLogger %s encountered an exception: %s' % (self.file_path, str(e)))
         except Exception as e:
             log.error('CSVLogger %s encountered an exception: %s' % (self.file_path, str(e)))
             halt.set()
         finally:
+            self.active = False
             if f is not None:
                 await f.close()
             # print('CSVLogger %s shut down...' % self.file_path)
@@ -61,6 +66,7 @@ class Consumer_log2csv(Consumer):
         log = logging.getLogger('log')
         file_outputs = {}
         tasks = []
+
         try:
             while not halt.is_set():
                 try:
@@ -69,7 +75,8 @@ class Consumer_log2csv(Consumer):
                     if file_path not in file_outputs:
                         file_outputs[file_path] = CSVLogger(file_path, next_data.characteristic.column_headers)
                         tasks.append(asyncio.create_task(file_outputs[file_path].run(halt)))
-                    await file_outputs[file_path].input_q.put(next_data)
+                    if file_outputs[file_path].active:
+                        await file_outputs[file_path].input_q.put(next_data)
                 except asyncio.TimeoutError:
                     pass
         except Exception as e:
@@ -87,4 +94,4 @@ class Consumer_log2csv(Consumer):
 
         n = "%s_%s.csv" % (name, char.name)
         n = n.replace(' ', '_')
-        return os.path.join('output_log2csv', n)
+        return os.path.join(self.config.log2csv_folder_name, n)
