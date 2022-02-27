@@ -7,7 +7,7 @@
             ],
             "configuration": {
                 "request": "launch",
-                "program": "robust_log.py",
+                "program": "BLELog.py",
                 "args": [
                 ],
                 "stopOnEntry": true
