@@ -159,7 +159,6 @@ config = Configuration(
     # create new connections
     mgr_interval=1,
 
-
     # ================== Consumer Settings ======================
 
     # Enable/disable logging of data to CSV files:

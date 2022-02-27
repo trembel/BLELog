@@ -12,7 +12,7 @@ from bleak import BleakClient
 from bleak.exc import BleakDBusError, BleakError
 
 from blelog.Configuration import Characteristic, Configuration
-from blelog.consumers.ConsumerMgr import NotifData
+from blelog.ConsumerMgr import NotifData
 
 
 @enum.unique

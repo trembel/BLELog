@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import Callable, List, Dict, Union
-from blelog.Util import normalise_adr, normalise_char_uuid
 from enum import Enum
 import enum
+
+from blelog.Util import normalise_adr, normalise_char_uuid
 
 
 @enum.unique

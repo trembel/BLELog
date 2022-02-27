@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import asyncio
 import logging
 import signal
@@ -8,14 +7,16 @@ from logging import FileHandler, StreamHandler
 
 import config
 from blelog.ConnectionMgr import ConnectionMgr
-from blelog.consumers.consumer_log2csv import Consumer_log2csv
-from blelog.consumers.consumer_plotter import Consumer_plotter
-from blelog.consumers.ConsumerMgr import ConsumerMgr
 from blelog.Scanner import Scanner
-from blelog.tui.TUI import TUI
-from blelog.tui.TUI_Connections import TUI_Connections
-from blelog.tui.TUI_Log import TUI_Log
-from blelog.tui.TUI_Scanner import TUI_Scanner
+from blelog.TUI import TUI
+from blelog.ConsumerMgr import ConsumerMgr
+
+from blelog.consumers.log2csv import Consumer_log2csv
+from blelog.consumers.plotter import Consumer_plotter
+
+from blelog.curses_tui_components.Connections_TUI import Connections_TUI
+from blelog.curses_tui_components.Log_TUI import Log_TUI
+from blelog.curses_tui_components.Scanner_TUI import Scanner_TUI
 
 
 async def main():
@@ -58,11 +59,11 @@ async def main():
     # Create the TUI:
     tui = TUI(configuration)
 
-    tui_scanner = TUI_Scanner(scnr, configuration)
+    tui_scanner = Scanner_TUI(scnr, configuration)
     tui.add_component(tui_scanner)
-    tui_conns = TUI_Connections(con_mgr, configuration)
+    tui_conns = Connections_TUI(con_mgr, configuration)
     tui.add_component(tui_conns)
-    tui_log = TUI_Log(configuration)
+    tui_log = Log_TUI(configuration)
     tui.add_component(tui_log)
 
     tui.set_plot_toggle(consume_plot.toggle_on_off)

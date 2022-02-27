@@ -3,10 +3,10 @@ import time
 from typing import List
 
 from blelog.Scanner import Scanner, SeenDeviceState
-from blelog.tui.TUI import TUIComponent
+from blelog.TUI import CursesTUI_Component
 
 
-class TUI_Scanner(TUIComponent):
+class Scanner_TUI(CursesTUI_Component):
     def __init__(self, scnr: Scanner, config):
         self.scnr = scnr
 

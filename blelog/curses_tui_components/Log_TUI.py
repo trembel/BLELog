@@ -3,10 +3,10 @@ import logging
 from typing import List
 
 from blelog.Configuration import Configuration
-from blelog.tui.TUI import TUIComponent, LogHandler
+from blelog.TUI import CursesTUI_Component, LogHandler
 
 
-class TUI_Log(TUIComponent):
+class Log_TUI(CursesTUI_Component):
     def __init__(self, config: Configuration, max_height=10):
         self.max_height = max_height
         self.config = config

@@ -1,5 +1,4 @@
 from asyncio.queues import Queue
-from asyncio.tasks import Task
 import logging
 import asyncio
 from asyncio import Event

@@ -30,7 +30,7 @@ class AsyncLogHandler(logging.Handler):
         return True
 
 
-class TUIComponent(ABC):
+class CursesTUI_Component(ABC):
     @abstractmethod
     def get_lines(self) -> List[str]:
         pass
@@ -54,7 +54,7 @@ class TUI:
         self.console_lh.setLevel(logging.INFO)
         logging.getLogger('log').addHandler(self.console_lh)
 
-    def add_component(self, c: TUIComponent) -> None:
+    def add_component(self, c: CursesTUI_Component) -> None:
         self.components.append(c)
 
     def set_halt_handler(self, hndlr) -> None:
@@ -109,12 +109,14 @@ class TUI:
             stdscr.keypad(True)
 
             while not halt.is_set():
-                # Get lines from each TUI component:
+                # Header:
                 lines = []
                 lines.append('========== BLELOG =========')
                 lines.append('')
                 lines.append('Press \'g\' to toggle gui plotter!')
                 lines.append('')
+
+                # Get lines from each TUI component:
                 for c in self.components:
                     lines.append('========== %s =========' % c.title())
                     lines.append('')
@@ -128,13 +130,16 @@ class TUI:
                 stdscr.refresh()
 
                 # Handle input
-                # Needed under windows to catch CTRL-C
                 stdscr.nodelay(True)
                 c = stdscr.getch()
+
+                # Under windows, the SIGINT handler is not called automatically.
+                # Manually call it:
                 if c == 3:
                     if self.halt_hndlr is not None:
                         self.halt_hndlr()
 
+                # Toggle plotter gui
                 if c == ord('G') or c == ord('g'):
                     if self.plot_toggle is not None:
                         self.plot_toggle()

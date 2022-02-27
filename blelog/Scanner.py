@@ -1,4 +1,3 @@
-from bleak import BleakScanner
 from typing import Union, List, Dict
 import time
 from dataclasses import dataclass
@@ -9,9 +8,13 @@ from enum import Enum
 import re
 import logging
 
+from bleak import BleakScanner
 from bleak.backends.device import BLEDevice
+
 from blelog.Configuration import Configuration
 from blelog.Util import normalise_adr
+
+
 @enum.unique
 class SeenDeviceState(Enum):
     NOT_SEEN = 0

@@ -51,31 +51,11 @@ class ConsumerMgr:
         log = logging.getLogger('log')
         try:
             # Spinup all consumers:
-            for consumer in self.consumers:
-                tsk = asyncio.create_task(consumer.run(halt))
-                self.consumer_tasks.append(tsk)
-                log.info('Consumer %s enabled!' % consumer.__class__.__name__)
+            self._launch_consumers(halt)
 
             while not halt.is_set():
-                try:
-                    # Grab data, distribute to all consumers:
-                    next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)
-                    for consumer in self.consumers:
-                        try:
-                            consumer.input_q.put_nowait(next_data)
-                        except QueueFull:
-                            log.warning('Consumer %s did not accept data!' % type(consumer).__name__)
-                    self.input_q.task_done()
-
-                    # Check if any consumers are lagging behind:
-                    for consumer in self.consumers:
-                        if consumer.input_q.qsize() > warn_thsh:
-                            log.warning('The input queue of consumer %s has more than %i items, is the consumer keeping up?'
-                                        % (type(consumer).__name__, consumer.input_q.qsize()))
-                            consumer.last_full_queue_warning = time.monotonic_ns()
-
-                except asyncio.TimeoutError:
-                    pass
+                await self._distribute_data()
+                self._monitor_timeouts()
 
         except Exception as e:
             log.error('ConsumerMgr encountered an exception: %s' % str(e))
@@ -83,3 +63,34 @@ class ConsumerMgr:
         finally:
             await asyncio.gather(*self.consumer_tasks)
             print('ConsumerMgr shut down...')
+
+    def _launch_consumers(self, halt: Event) -> None:
+        log = logging.getLogger('log')
+        for consumer in self.consumers:
+            tsk = asyncio.create_task(consumer.run(halt))
+            self.consumer_tasks.append(tsk)
+            log.info('Consumer %s enabled!' % consumer.__class__.__name__)
+
+    async def _distribute_data(self):
+        log = logging.getLogger('log')
+        try:
+            # Grab data, distribute to all consumers:
+            next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)
+            for consumer in self.consumers:
+                try:
+                    consumer.input_q.put_nowait(next_data)
+                except QueueFull:
+                    log.warning('Consumer %s did not accept data!' % type(consumer).__name__)
+            self.input_q.task_done()
+
+        except asyncio.TimeoutError:
+            pass
+
+    def _monitor_timeouts(self):
+        log = logging.getLogger('log')
+        # Check if any consumers are lagging behind:
+        for consumer in self.consumers:
+            if consumer.input_q.qsize() > warn_thsh:
+                log.warning('The input queue of consumer %s has more than %i items, is the consumer keeping up?'
+                            % (type(consumer).__name__, consumer.input_q.qsize()))
+                consumer.last_full_queue_warning = time.monotonic_ns()

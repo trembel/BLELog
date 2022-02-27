@@ -8,8 +8,9 @@ import os
 import csv
 import io
 
+
 from blelog.Configuration import Configuration
-from blelog.consumers.ConsumerMgr import Consumer, NotifData
+from blelog.ConsumerMgr import Consumer, NotifData
 
 
 class CSVLogger:
@@ -61,30 +62,42 @@ class Consumer_log2csv(Consumer):
     def __init__(self, config: Configuration):
         super().__init__()
         self.config = config
+        self.file_outputs = {}
+        self.tasks = []
 
     async def run(self, halt: Event):
         log = logging.getLogger('log')
-        file_outputs = {}
-        tasks = []
 
         try:
+
             while not halt.is_set():
                 try:
                     next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)  # type: NotifData
-                    file_path = self.file_path(next_data.device_adr, next_data.characteristic)
-                    if file_path not in file_outputs:
-                        file_outputs[file_path] = CSVLogger(file_path, next_data.characteristic.column_headers)
-                        tasks.append(asyncio.create_task(file_outputs[file_path].run(halt)))
-                    if file_outputs[file_path].active:
-                        await file_outputs[file_path].input_q.put(next_data)
+                    await self._log_to_file(next_data, halt)
                 except asyncio.TimeoutError:
                     pass
+
         except Exception as e:
             log.error('Consumer log2csv encountered an exception: %s' % str(e))
             halt.set()
         finally:
-            await asyncio.gather(*tasks)
+            await asyncio.gather(*self.tasks)
             print('Consumer log2csv shut down...')
+
+    async def _log_to_file(self, next_data: NotifData, halt: Event):
+        # determine file path:
+        file_path = self.file_path(next_data.device_adr, next_data.characteristic)
+
+        if file_path not in self.file_outputs:
+            # File not yet opened, open:
+            file_output = CSVLogger(file_path, next_data.characteristic.column_headers)
+            self.file_outputs[file_path] = file_output
+            file_task = asyncio.create_task(self.file_outputs[file_path].run(halt))
+            self.tasks.append(file_task)
+
+        if self.file_outputs[file_path].active:
+            # Open, write:
+            await self.file_outputs[file_path].input_q.put(next_data)
 
     def file_path(self, device_adr, char):
         if device_adr in self.config.device_aliases:

@@ -3,12 +3,12 @@ import tabulate
 import time
 
 from blelog.Configuration import Configuration
-from blelog.tui.TUI import TUIComponent
+from blelog.TUI import CursesTUI_Component
 from blelog.ConnectionMgr import ConnectionMgr
 from blelog.ActiveConnection import ConnectionState
 
 
-class TUI_Connections(TUIComponent):
+class Connections_TUI(CursesTUI_Component):
     def __init__(self, mgr: ConnectionMgr, config: Configuration):
         self.mgr = mgr
         self.config = config

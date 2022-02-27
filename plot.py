@@ -1,7 +1,7 @@
 from collections import deque
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from blelog.consumers.ConsumerMgr import NotifData
+from blelog.ConsumerMgr import NotifData
 from blelog.Util import normalise_adr
 import multiprocessing as mp
 import queue
