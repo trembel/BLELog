@@ -74,7 +74,7 @@ class TUI:
         self.halt_hndlr = hndlr
 
     async def run(self, halt: Event) -> None:
-        if self.config.tui_mode == TUI_Mode.CURSE:
+        if self.config.tui_mode == TUI_Mode.CURSES:
             await self.run_curses(halt)
         else:
             await self.run_console(halt)

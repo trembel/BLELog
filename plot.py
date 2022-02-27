@@ -80,13 +80,16 @@ from blelog.Util import normalise_adr
 def plot(data_queue: mp.Queue):
     # If you want to print anything, don't use print(..) -
     # Use the logger:
-    # log = logging.getLogger('log')
+    log = logging.getLogger('log')
     # log.info('Helllooooooo wooooorld!')
 
     # To keep things simple, let's only plot data from a specific device
     # Note: normalise_adr makes sure the address is in the same format
     # used in blelog
     device_adr = normalise_adr('EB:E5:31:BF:2E:B5')
+    device_name = "SP-Case"
+
+    log.info('Plotter listening to device %s - %s' % (device_name, device_adr))
 
     # Setup plot with 5 subplots:
     fig1, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(5)

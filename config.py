@@ -15,7 +15,7 @@ config = Configuration(
     # Connect via address:
     # A list of addresses that BLELog will attempt to connect to:
     connect_device_adrs=[
-        'E3:11:20:62:5D:3F',
+        # 'E3:11:20:62:5D:3F',
         'EB:E5:31:BF:2E:B5',
     ],
 
@@ -144,7 +144,7 @@ config = Configuration(
 
     # ================ Connection Parameters =====================
     # Maximum number of simultaneously active connections:
-    max_active_connections=1,
+    max_active_connections=2,
 
     # Maximum time an establishing a connection can take before being aborted:
     connection_timeout_hard=30,
