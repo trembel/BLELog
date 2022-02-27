@@ -156,12 +156,12 @@ config = Configuration(
 
     # Maximum number of simultaneous connection attempts:
     # Anything higher than one sometimes causes instability.
-    max_simulatneous_connection_attempts=1,
+    max_simultaneous_connection_attempts=1,
 
     # Initial Characteristic Timeout:
     # An additional amount of time (in seconds) allowed in addition to the
     # characteristic timeout for the first notification.
-    initial_characterisitc_timeout=10,
+    initial_characteristic_timeout=10,
 
     # Manager Interval:
     # Time in seconds between connection manager attempting to
