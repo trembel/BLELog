@@ -113,7 +113,8 @@ class TUI:
                 lines = []
                 lines.append('========== BLELOG =========')
                 lines.append('')
-                lines.append('Press \'g\' to toggle gui plotter!')
+                lines.append('\'g\': Toggle GUI Plot')
+                lines.append('\'CTRL-C\': Close BLELog')
                 lines.append('')
 
                 # Get lines from each TUI component:
