@@ -15,7 +15,7 @@ config = Configuration(
     # Connect via address:
     # A list of addresses that BLELog will attempt to connect to:
     connect_device_adrs=[
-        # 'E3:11:20:62:5D:3F',
+        'E3:11:20:62:5D:3F',
         'EB:E5:31:BF:2E:B5',
     ],
 
@@ -81,21 +81,21 @@ config = Configuration(
             data_decoder=decode_ppg
         ),
 
-        Characteristic(
-            name='temp',
-            uuid='18095c47-81d2-44e5-a350-aef131810001',
-            timeout=50,
-            column_headers=['index', 'temp'],
-            data_decoder=decode_temp
-        ),
+        # Characteristic(
+        #     name='temp',
+        #     uuid='18095c47-81d2-44e5-a350-aef131810001',
+        #     timeout=50,
+        #     column_headers=['index', 'temp'],
+        #     data_decoder=decode_temp
+        # ),
 
-        Characteristic(
-            name='qvar',
-            uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
-            timeout=3,
-            column_headers=['index', 'qvar'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
+        # Characteristic(
+        #     name='qvar',
+        #     uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
+        #     timeout=3,
+        #     column_headers=['index', 'qvar'],
+        #     data_decoder=decode_acc_gyr_qvar
+        # ),
 
         Characteristic(
             name='acc_x',

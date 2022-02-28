@@ -81,22 +81,20 @@ class ActiveConnection:
                         log.warning('Connection to %s lost!' % self.name)
                         raise ActiveConnectionException()
 
-                    await self._check_for_timeout(con)
+                    await self._check_for_timeout()
 
                     await asyncio.sleep(0.02)
 
             except ActiveConnectionException:
                 pass
             finally:
-                if self.con is not None:
-                    if self.con.is_connected:
-                        await self.con.disconnect()
+                await self._do_disconnect()
 
             self.state = ConnectionState.DISCONNECTED
 
         except Exception as e:
             log.error('Connection %s encountered an exception: %s' % (self.name, str(e)))
-            halt.set()
+            self.did_disconnect = True
         finally:
             if halt.is_set():
                 print('Connection %s shut down...' % self.name)
@@ -121,6 +119,9 @@ class ActiveConnection:
         except asyncio.TimeoutError:
             log.warning('Failed to connect to %s: Timeout' % self.name)
             raise ActiveConnectionException()
+        except OSError:
+            log.warning('Failed to connect to %s: OSError' % self.name)
+            raise ActiveConnectionException()
 
         log.info('Established connection to %s!' % self.name)
 
@@ -136,7 +137,7 @@ class ActiveConnection:
         log.info('Enabled notifications for all characteristic for %s!' % self.name)
         self.state = ConnectionState.CONNECTED
 
-    async def _check_for_timeout(self, con: BleakClient) -> None:
+    async def _check_for_timeout(self) -> None:
         log = logging.getLogger('log')
 
         if self.initial_connection_time is None:
@@ -154,8 +155,7 @@ class ActiveConnection:
                     if has_been > timeout:
                         log.warning('%s: Timeout for characteristic %s expired, disconnecting..' %
                                     (self.name, char.name))
-                        await con.disconnect()
-                        log.warning('Disconnected from %s.' % self.name)
+                        await self._do_disconnect()
                         raise ActiveConnectionException()
 
                 elif self.config.initial_characteristic_timeout is not None:
@@ -167,9 +167,7 @@ class ActiveConnection:
                     if has_been > timeout:
                         log.warning('%s: Never received a notification for %s, disconnecting...' %
                                     (self.name, char.name))
-                        await con.disconnect()
-                        log.warning('Disconnected from %s.' % self.name)
-                        raise ActiveConnectionException()
+                        await self._do_disconnect()
 
     def _disconnected_callback(self, _) -> None:
         self.did_disconnect = True
@@ -190,8 +188,20 @@ class ActiveConnection:
         except Exception as e:
             self.log.error("Decoder for %s raised an exception: %s" % (char.name, str(e)))
 
-    async def do_disconnect(self) -> None:
+    async def _do_disconnect(self) -> None:
+        log = logging.getLogger('log')
         if self.con is not None:
-            await self.con.disconnect()
-
-        self.did_disconnect = True
+            try:
+                did_disconnect = await asyncio.wait_for(self.con.disconnect(), timeout=70)
+                if did_disconnect:
+                    log.warning('Disconnected from %s.' % self.name)
+                else:
+                    log.warning('Failed to disconnect from %s: Bleak Error.' % self.name)
+            except BleakDBusError:
+                log.warning('Failed to disconnect from %s: DBus Error.' % self.name)
+            except BleakError as e:
+                log.warning('Failed to disconnect from %s: %s' % (self.name, e))
+            except asyncio.TimeoutError:
+                log.warning('Failed to disconnect from %s: Timeout' % self.name)
+            except OSError:
+                log.warning('Failed to disconnect from %s: OSError' % self.name)
