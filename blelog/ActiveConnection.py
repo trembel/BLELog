@@ -1,6 +1,6 @@
 """
 blelog/ActiveConnection.py
-A single connection to a specific device. Managed by ConnectionMgr
+A single connection to a specific device. Managed by ConnectionMgr.
 
 BLELog - Philipp Schilk, 2022
 PBL, ETH Zuerich
@@ -73,6 +73,10 @@ class ActiveConnection:
 
                 # Connect:
                 await self._connect(self.con)
+
+                # Start zephyr fix task, if the zephyr hotfix is enabled:
+                if self.config.zephyr_fix_enabled:
+                    asyncio.create_task(self._task_zephyr_fix(halt, con))
 
                 while not halt.is_set():
                     # Check for disconnection
@@ -205,3 +209,37 @@ class ActiveConnection:
                 log.warning('Failed to disconnect from %s: Timeout' % self.name)
             except OSError:
                 log.warning('Failed to disconnect from %s: OSError' % self.name)
+            finally:
+                self.did_disconnect = True
+
+    async def _task_zephyr_fix(self, halt: Event, con: BleakClient) -> None:
+        """ Repeadetly poll a set characteristic to work around a zephyr bug"""
+
+        logged_enabled = False
+
+        try:
+            while not halt.is_set():
+                last_heartbeat = time.monotonic()
+                _ = await asyncio.wait_for(con.read_gatt_char(self.config.zephyr_fix_heartbeat_characterisitc_uuid),
+                                           timeout=self.config.zephyr_fix_heartbeat_timeout)
+
+                if not logged_enabled:
+                    logged_enabled = True
+                    self.log.info("%s: Zephyr fix running." % self.name)
+
+                time_waited = time.monotonic() - last_heartbeat
+
+                if(time_waited < self.config.zephyr_fix_heartbeat_poll_rate):
+                    to_wait = min(self.config.zephyr_fix_heartbeat_poll_rate - time_waited, 0)
+                    await asyncio.sleep(to_wait)
+
+        except asyncio.TimeoutError:
+            # Manual read took longer than timeout.
+            self.log.warning("%s's zephyr-fix read timed-out. Disconnecting.." % self.name)
+            await self._do_disconnect()
+        except (BleakDBusError, BleakError, OSError) as e:
+            self.log.warning('%s: Failed to read zephyr-fix characteristic. (%s)' % (self.name, e))
+            await self._do_disconnect()
+        except Exception as e:
+            self.log.error('Connection %s\' zephyr-fix encountered an exception: %s' % (self.name, str(e)))
+            self.did_disconnect=True

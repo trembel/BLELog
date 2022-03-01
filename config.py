@@ -81,21 +81,21 @@ config = Configuration(
             data_decoder=decode_ppg
         ),
 
-        # Characteristic(
-        #     name='temp',
-        #     uuid='18095c47-81d2-44e5-a350-aef131810001',
-        #     timeout=50,
-        #     column_headers=['index', 'temp'],
-        #     data_decoder=decode_temp
-        # ),
+        Characteristic(
+            name='temp',
+            uuid='18095c47-81d2-44e5-a350-aef131810001',
+            timeout=50,
+            column_headers=['index', 'temp'],
+            data_decoder=decode_temp
+        ),
 
-        # Characteristic(
-        #     name='qvar',
-        #     uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
-        #     timeout=3,
-        #     column_headers=['index', 'qvar'],
-        #     data_decoder=decode_acc_gyr_qvar
-        # ),
+        Characteristic(
+            name='qvar',
+            uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
+            timeout=3,
+            column_headers=['index', 'qvar'],
+            data_decoder=decode_acc_gyr_qvar
+        ),
 
         Characteristic(
             name='acc_x',
@@ -141,6 +141,32 @@ config = Configuration(
             data_decoder=decode_acc_gyr_qvar
         )
     ],
+
+    # ====================== Zephyr Fix ===========================
+
+    # Workaround to a bug in zephyr/the smartpatch firmware.
+    # For details ask about "That queue bug in zephyr that cost Philipp
+    # a week's worth of sanity" at 'cortesis@ethz.ch' and he will
+    # happily explain something about mutexes - not exactly sure of the
+    # details.
+
+    # This will manually read a specified characteristic at a given
+    # interval, which avoids/solves a Smartpatch-internal queue overflow.
+    # The result is discarded.
+
+    # Enable this fix:
+    zephyr_fix_enabled=True,
+
+    # UUID of characteristic to poll
+    zephyr_fix_heartbeat_characterisitc_uuid="00002A19-0000-1000-8000-00805F9B34FB",
+
+    # Minimimum interval (in seconds) at which this characteristic should
+    # be polled:
+    zephyr_fix_heartbeat_poll_rate=1,
+
+    # Timeout (in seconds). If there is no reponse after this period,
+    # The connection will be closed. Set to 'None' to disable.
+    zephyr_fix_heartbeat_timeout=4,
 
     # ================ Connection Parameters =====================
     # Maximum number of simultaneously active connections:
