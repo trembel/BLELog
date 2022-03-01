@@ -73,10 +73,12 @@ class ActiveConnection:
 
                 # Connect:
                 await self._connect(self.con)
+                self.initial_connection_time = time.monotonic_ns()
 
                 # Start zephyr fix task, if the zephyr hotfix is enabled:
                 if self.config.zephyr_fix_enabled:
                     asyncio.create_task(self._task_zephyr_fix(halt, con))
+
 
                 while not halt.is_set():
                     # Check for disconnection
@@ -144,9 +146,6 @@ class ActiveConnection:
     async def _check_for_timeout(self) -> None:
         log = logging.getLogger('log')
 
-        if self.initial_connection_time is None:
-            self.initial_connection_time = time.monotonic_ns()
-
         for char in self.config.characteristics:
             if char.timeout is not None:
                 last_notif = self.last_notif[char.uuid]
@@ -163,6 +162,8 @@ class ActiveConnection:
                         raise ActiveConnectionException()
 
                 elif self.config.initial_characteristic_timeout is not None:
+                    if self.initial_connection_time is None:
+                        raise Exception("Implementation error")
 
                     # Check if initial timeout expired
                     timeout = char.timeout + self.config.initial_characteristic_timeout
@@ -242,4 +243,16 @@ class ActiveConnection:
             await self._do_disconnect()
         except Exception as e:
             self.log.error('Connection %s\' zephyr-fix encountered an exception: %s' % (self.name, str(e)))
-            self.did_disconnect=True
+            self.did_disconnect = True
+
+    def active_time_str(self) -> str:
+        if self.initial_connection_time is None:
+            return "xx:xx:xx"
+        else:
+            active_s = (time.monotonic_ns() - self.initial_connection_time) / 1e9
+            h = active_s // (3600)
+            active_s %= (3600)
+            min = active_s // 60
+            active_s %= 60
+            s = active_s // 1
+            return "%02i:%02i:%02i" % (h, min, s)
