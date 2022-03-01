@@ -14,6 +14,7 @@ import sys
 from asyncio import Event
 
 import blelog.Logging as Logging
+from blelog.consumers.sp_index_check import Consumer_SPIndexChecker
 import config
 from blelog.ConnectionMgr import ConnectionMgr
 from blelog.ConsumerMgr import ConsumerMgr
@@ -44,6 +45,9 @@ async def main():
 
     consume_plot = Consumer_plotter(configuration)
     consume_mgr.add_consumer(consume_plot)
+
+    consume_index_check = Consumer_SPIndexChecker()
+    consume_mgr.add_consumer(consume_index_check)
 
     # Create the scanner:
     scnr = Scanner(config=configuration)
