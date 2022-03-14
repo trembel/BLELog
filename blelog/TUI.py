@@ -107,6 +107,7 @@ class TUI:
 
         except Exception as e:
             log.error('TUI encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             print('TUI Shutdown...')
