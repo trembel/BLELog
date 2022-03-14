@@ -173,6 +173,7 @@ class TUI:
                 await asyncio.sleep(self.config.curse_tui_interval)
         except Exception as e:
             log.error('TUI encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             self.off()

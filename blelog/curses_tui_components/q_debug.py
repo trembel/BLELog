@@ -24,7 +24,7 @@ class q_TUI(CursesTUI_Component):
             q_s[str(consumer.__class__.__name__)] = consumer.input_q
 
             if isinstance(consumer, Consumer_log2csv):
-                for output in consumer.file_outputs:
+                for output in consumer.file_outputs.values():
                     q_s[output.file_path] = output.input_q
 
         rows = []
