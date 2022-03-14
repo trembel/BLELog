@@ -22,7 +22,7 @@ from blelog.consumers.plotter import Consumer_plotter
 from blelog.consumers.sp_index_check import Consumer_SPIndexChecker
 from blelog.curses_tui_components.Connections_TUI import Connections_TUI
 from blelog.curses_tui_components.Log_TUI import Log_TUI
-from blelog.curses_tui_components.q_debug import q_TUI
+# from blelog.curses_tui_components.q_debug import q_TUI
 from blelog.curses_tui_components.Scanner_TUI import Scanner_TUI
 from blelog.Scanner import Scanner
 from blelog.TUI import TUI
@@ -63,8 +63,8 @@ async def main():
     tui.add_component(tui_scanner)
     tui_conns = Connections_TUI(con_mgr, configuration)
     tui.add_component(tui_conns)
-    tui_q = q_TUI(con_mgr, consume_mgr)
-    tui.add_component(tui_q)
+    # tui_q = q_TUI(con_mgr, consume_mgr)
+    # tui.add_component(tui_q)
     tui_log = Log_TUI(configuration)
     tui.add_component(tui_log)
 
