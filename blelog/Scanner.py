@@ -7,15 +7,15 @@ PBL, ETH Zuerich
 ---------------------------------
 """
 
-from typing import Union, List, Dict
-import time
-from dataclasses import dataclass
 import asyncio
-from asyncio import Event
 import enum
-from enum import Enum
-import re
 import logging
+import re
+import time
+from asyncio import Event
+from dataclasses import dataclass
+from enum import Enum
+from typing import Dict, List, Union
 
 from bleak import BleakScanner
 from bleak.backends.device import BLEDevice
@@ -76,14 +76,20 @@ class Scanner:
         try:
             while not halt.is_set():
                 # Scan
-                devices = await BleakScanner.discover(timeout=self.config.scan_duration)
-                t = time.monotonic_ns()
+                try:
+                    devices = await asyncio.wait_for(
+                        BleakScanner.discover(timeout=self.config.scan_duration),
+                        timeout=15)
 
-                # Update list of seen devices:
-                self._update_seen_devices(devices, t)
+                    t = time.monotonic_ns()
 
-                # Cooldown
-                await asyncio.sleep(self.config.scan_cooldown)
+                    # Update list of seen devices:
+                    self._update_seen_devices(devices, t)
+
+                    # Cooldown
+                    await asyncio.sleep(self.config.scan_cooldown)
+                except asyncio.TimeoutError:
+                    log.warning('Scanner time out...')
         except Exception as e:
             log.error('Scanner encountered an exception: %s' % str(e))
             halt.set()
