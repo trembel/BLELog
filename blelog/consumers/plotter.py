@@ -49,7 +49,8 @@ class PlottingProcess(mp.Process):
         try:
             plot(self.input_q)
         except Exception as e:
-            self.log_q.put(str(e))
+            log.error("Plotter encountered an exception!")
+            log.exception(e)
 
 
 class Consumer_plotter(Consumer):
