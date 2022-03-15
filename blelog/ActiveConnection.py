@@ -116,11 +116,13 @@ class ActiveConnection:
             if not ok:
                 log.warning('Failed to connect to %s!' % self.name)
                 raise ActiveConnectionException()
-        except BleakDBusError:
+        except BleakDBusError as e:
             log.warning('Failed to connect to %s: DBus Error.' % self.name)
+            log.exception(e)
             raise ActiveConnectionException()
         except BleakError as e:
             log.warning('Failed to connect to %s: %s' % (self.name, e))
+            log.exception(e)
             raise ActiveConnectionException()
         except asyncio.TimeoutError:
             log.warning('Failed to connect to %s: Timeout' % self.name)
