@@ -6,15 +6,15 @@ BLELog - Philipp Schilk, 2022
 PBL, ETH Zuerich
 ---------------------------------
 """
-from asyncio.queues import Queue, QueueFull
-import functools
-import time
-from typing import Union, Dict
 import asyncio
-from asyncio import Event
 import enum
-from enum import Enum
+import functools
 import logging
+import time
+from asyncio import Event
+from asyncio.queues import Queue, QueueFull
+from enum import Enum
+from typing import Dict, Union
 
 from bleak import BleakClient
 from bleak.exc import BleakDBusError, BleakError
@@ -78,7 +78,6 @@ class ActiveConnection:
                 # Start zephyr fix task, if the zephyr hotfix is enabled:
                 if self.config.zephyr_fix_enabled:
                     asyncio.create_task(self._task_zephyr_fix(halt, con))
-
 
                 while not halt.is_set():
                     # Check for disconnection
@@ -199,7 +198,7 @@ class ActiveConnection:
         log = logging.getLogger('log')
         if self.con is not None:
             try:
-                did_disconnect = await asyncio.wait_for(self.con.disconnect(), timeout=70)
+                did_disconnect = await asyncio.wait_for(self.con.disconnect(), timeout=20)
                 if did_disconnect:
                     log.warning('Disconnected from %s.' % self.name)
                 else:
