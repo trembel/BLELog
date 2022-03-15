@@ -17,6 +17,7 @@ config = Configuration(
     connect_device_adrs=[
         'E3:11:20:62:5D:3F',
         'EB:E5:31:BF:2E:B5',
+        'F1:4C:55:7A:1C:FD'
     ],
 
     # Connect via device name:
@@ -33,7 +34,8 @@ config = Configuration(
     # If provided, it has to be unique.
     device_aliases={
         'EB:E5:31:BF:2E:B5': 'SP-Case',
-        'E3:11:20:62:5D:3F': 'SP-NoCase'
+        'E3:11:20:62:5D:3F': 'SP-NoCase',
+        'F1:4C:55:7A:1C:FD': 'SP-SmallBat'
     },
 
     # Characteristics:
@@ -170,7 +172,7 @@ config = Configuration(
 
     # ================ Connection Parameters =====================
     # Maximum number of simultaneously active connections:
-    max_active_connections=2,
+    max_active_connections=3,
 
     # Maximum time an establishing a connection can take before being aborted:
     connection_timeout_hard=30,
@@ -220,7 +222,7 @@ config = Configuration(
     # Automatically open the data plot GUI on startup:
     # Useful in 'CONSOLE' tui mode, as the plotter cannot
     # be manually opened.
-    plotter_open_by_default=True,
+    plotter_open_by_default=False,
 
     # Shut down BLElog when the plot GUI is closed:
     # Not recommended. This will stop BLElog if plotting fails
