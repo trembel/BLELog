@@ -41,12 +41,12 @@ class CSVLogger:
                 await self.write_row(f, self.column_headers)
                 # log.info('Created %s' % self.file_path)
 
-            while not halt.is_set():
+            while not (halt.is_set() and self.input_q.empty()):
                 try:
                     next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)  # type: NotifData
                     for row in next_data.data:
                         await self.write_row(f, row)
-                    await f.flush()
+                    self.input_q.task_done()
                 except asyncio.TimeoutError:
                     pass
         except FileNotFoundError as e:
@@ -90,6 +90,8 @@ class Consumer_log2csv(Consumer):
             log.error('Consumer log2csv encountered an exception: %s' % str(e))
             halt.set()
         finally:
+            queue_join = [o.input_q.join() for o in self.file_outputs.values()]
+            await asyncio.gather(*queue_join)
             await asyncio.gather(*self.tasks)
             print('Consumer log2csv shut down...')
 
