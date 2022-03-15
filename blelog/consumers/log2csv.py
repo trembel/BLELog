@@ -46,6 +46,7 @@ class CSVLogger:
                     next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)  # type: NotifData
                     for row in next_data.data:
                         await self.write_row(f, row)
+                    await f.flush()
                     self.input_q.task_done()
                 except asyncio.TimeoutError:
                     pass
