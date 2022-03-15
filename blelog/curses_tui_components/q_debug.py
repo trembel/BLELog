@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List
 
 from tabulate import tabulate
@@ -8,6 +9,12 @@ from blelog.consumers.log2csv import Consumer_log2csv
 from blelog.TUI import CursesTUI_Component
 
 
+@dataclass
+class q_info:
+    name: str
+    size: int
+
+
 class q_TUI(CursesTUI_Component):
     def __init__(self, con_mgr: ConnectionMgr, consum_mgr: ConsumerMgr):
         self.con_mgr = con_mgr
@@ -15,30 +22,40 @@ class q_TUI(CursesTUI_Component):
 
     def get_lines(self) -> List[str]:
 
-        q_s = {}
+        q_s = []
 
-        q_s['Connections Output'] = self.con_mgr.output_queue
-
+        q_s.append(q_info('Connection Output', self.con_mgr.output_queue.qsize()))
 
         for consumer in self.consum_mgr.consumers:
-            q_s[str(consumer.__class__.__name__)] = consumer.input_q
+            i = q_info(
+                name=consumer.__class__.__name__,
+                size=consumer.input_q.qsize()
+            )
+            q_s.append(i)
 
             if isinstance(consumer, Consumer_log2csv):
                 for output in consumer.file_outputs.values():
-                    q_s[output.file_path] = output.input_q
+                    i = q_info(
+                        name=output.file_path,
+                        size=output.input_q.qsize()
+                    )
+                    q_s.append(i)
 
-        rows = []
-        row = []
+        total_len = sum([q.size for q in q_s])
 
-        for name, q in q_s.items():
-            if len(row) == 2*3:
-                rows.append(row)
-                row = []
-            row.append(str(name))
-            row.append(str(q.qsize()))
+        rows = [
+            'Total queue length: %i' % total_len,
+            'Largest queues:']
+
+        row = ""
+        q_s.sort(key=lambda x: -x.size)
+        for i in range(min(4, len(q_s))):
+            q = q_s[i]
+            row += ("%s: %i   " % (q.name, q.size))
+
         rows.append(row)
 
-        return tabulate(rows, tablefmt='plain').splitlines()
+        return rows
 
     def title(self) -> str:
         return 'QUEUES'
