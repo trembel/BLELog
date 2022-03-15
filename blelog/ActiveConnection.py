@@ -77,7 +77,7 @@ class ActiveConnection:
 
                 # Start zephyr fix task, if the zephyr hotfix is enabled:
                 if self.config.zephyr_fix_enabled:
-                    asyncio.create_task(self._task_zephyr_fix(halt, con))
+                    self.fix_task = asyncio.create_task(self._task_zephyr_fix(halt, con))
 
                 while not halt.is_set():
                     # Check for disconnection
