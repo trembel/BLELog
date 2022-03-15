@@ -43,6 +43,6 @@ def setup_logging(config: Configuration):  # Setup log:
         log.addHandler(file_handler)
 
     # Add stream handler to print ERROR messages to stderr:
-    err_handler = StreamHandler(sys.stderr)
-    err_handler.setLevel(logging.ERROR)
-    log.addHandler(err_handler)
+    # err_handler = StreamHandler(sys.stderr)
+    # err_handler.setLevel(logging.ERROR)
+    # log.addHandler(err_handler)
