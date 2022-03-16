@@ -92,6 +92,7 @@ class Scanner:
                     log.warning('Scanner time out...')
         except Exception as e:
             log.error('Scanner encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             print('Scanner shut down...')

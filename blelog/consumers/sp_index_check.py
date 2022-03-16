@@ -38,5 +38,6 @@ class Consumer_SPIndexChecker(Consumer):
                     pass
 
         except Exception as e:
-            log.error('SP-Index Checker %s encountered an exception: %s' % str(e))
+            log.error('SP-Index Checker encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()

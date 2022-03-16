@@ -52,8 +52,10 @@ class CSVLogger:
                     pass
         except FileNotFoundError as e:
             log.error('CSVLogger %s encountered an exception: %s' % (self.file_path, str(e)))
+            log.exception(e)
         except Exception as e:
             log.error('CSVLogger %s encountered an exception: %s' % (self.file_path, str(e)))
+            log.exception(e)
             halt.set()
         finally:
             self.active = False
@@ -89,6 +91,7 @@ class Consumer_log2csv(Consumer):
 
         except Exception as e:
             log.error('Consumer log2csv encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             queue_join = [o.input_q.join() for o in self.file_outputs.values()]

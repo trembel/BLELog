@@ -67,6 +67,7 @@ class ConnectionMgr:
 
         except Exception as e:
             log.error('ConnectionMgr encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             await asyncio.gather(*self.tasks)

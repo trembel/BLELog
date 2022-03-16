@@ -49,7 +49,7 @@ class PlottingProcess(mp.Process):
         try:
             plot(self.input_q)
         except Exception as e:
-            log.error("Plotter encountered an exception!")
+            log.error("Plotting process encountered an exception: %s" % str(e))
             log.exception(e)
 
 
@@ -78,6 +78,7 @@ class Consumer_plotter(Consumer):
 
         except Exception as e:
             log.error('Consumer Plotter encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             if self.plotting_process is not None:

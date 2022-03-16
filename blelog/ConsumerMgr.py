@@ -72,6 +72,7 @@ class ConsumerMgr:
 
         except Exception as e:
             log.error('ConsumerMgr encountered an exception: %s' % str(e))
+            log.exception(e)
             halt.set()
         finally:
             await asyncio.gather(*self.consumer_tasks)

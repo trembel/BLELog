@@ -78,6 +78,7 @@ class ActiveConnection:
                 # Start zephyr fix task, if the zephyr hotfix is enabled:
                 if self.config.zephyr_fix_enabled:
                     self.fix_task = asyncio.create_task(self._task_zephyr_fix(halt, con))
+                    asyncio.create_task(self._task_zephyr_fix(halt, con))
 
                 while not halt.is_set():
                     # Check for disconnection
@@ -99,6 +100,7 @@ class ActiveConnection:
 
         except Exception as e:
             log.error('Connection %s encountered an exception: %s' % (self.name, str(e)))
+            log.exception(e)
             self.did_disconnect = True
         finally:
             if halt.is_set():
@@ -126,8 +128,9 @@ class ActiveConnection:
         except asyncio.TimeoutError:
             log.warning('Failed to connect to %s: Timeout' % self.name)
             raise ActiveConnectionException()
-        except OSError:
+        except OSError as e:
             log.warning('Failed to connect to %s: OSError' % self.name)
+            log.exception(e)
             raise ActiveConnectionException()
 
         log.info('Established connection to %s!' % self.name)
@@ -193,6 +196,7 @@ class ActiveConnection:
                 self.log.error("%s failed to put data into queue!" % self.name)
         except Exception as e:
             self.log.error("Decoder for %s raised an exception: %s" % (char.name, str(e)))
+            self.log.exception(e)
 
     async def _do_disconnect(self) -> None:
         log = logging.getLogger('log')
@@ -244,6 +248,7 @@ class ActiveConnection:
             await self._do_disconnect()
         except Exception as e:
             self.log.error('Connection %s\' zephyr-fix encountered an exception: %s' % (self.name, str(e)))
+            self.log.exception(e)
             self.did_disconnect = True
 
     def active_time_str(self) -> str:
