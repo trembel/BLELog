@@ -226,7 +226,7 @@ class ActiveConnection:
         try:
             while not halt.is_set():
                 last_heartbeat = time.monotonic()
-                _ = await asyncio.wait_for(con.read_gatt_char(self.config.zephyr_fix_heartbeat_characterisitc_uuid),
+                _ = await asyncio.wait_for(con.read_gatt_char(self.config.zephyr_fix_heartbeat_characteristic_uuid),
                                            timeout=self.config.zephyr_fix_heartbeat_timeout)
 
                 if not logged_enabled:

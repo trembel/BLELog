@@ -160,7 +160,7 @@ config = Configuration(
     zephyr_fix_enabled=True,
 
     # UUID of characteristic to poll
-    zephyr_fix_heartbeat_characterisitc_uuid="00002A19-0000-1000-8000-00805F9B34FB",
+    zephyr_fix_heartbeat_characteristic_uuid="00002A19-0000-1000-8000-00805F9B34FB",
 
     # Minimimum interval (in seconds) at which this characteristic should
     # be polled:

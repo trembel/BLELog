@@ -43,7 +43,7 @@ class Configuration:
     connection_timeout_hard: float
     connection_timeout_scan: float
     zephyr_fix_enabled: bool
-    zephyr_fix_heartbeat_characterisitc_uuid: str
+    zephyr_fix_heartbeat_characteristic_uuid: str
     zephyr_fix_heartbeat_poll_rate: float
     zephyr_fix_heartbeat_timeout: Union[None, float]
 
