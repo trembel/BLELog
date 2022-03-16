@@ -96,13 +96,12 @@ class ActiveConnection:
             finally:
                 await self._do_disconnect()
 
-            self.state = ConnectionState.DISCONNECTED
-
         except Exception as e:
             log.error('Connection %s encountered an exception: %s' % (self.name, str(e)))
             log.exception(e)
             self.did_disconnect = True
         finally:
+            self.state = ConnectionState.DISCONNECTED
             if halt.is_set():
                 print('Connection %s shut down...' % self.name)
 
