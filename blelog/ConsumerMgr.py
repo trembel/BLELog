@@ -7,14 +7,14 @@ BLELog - Philipp Schilk, 2022
 PBL, ETH Zuerich
 ---------------------------------
 """
-from abc import ABC, abstractmethod
-from asyncio.queues import QueueFull
-from dataclasses import dataclass
+import asyncio
 import logging
 import time
-from typing import Any, List, Union
-import asyncio
+from abc import ABC, abstractmethod
 from asyncio import Event, Queue
+from asyncio.queues import QueueFull
+from dataclasses import dataclass
+from typing import Any, List, Union
 
 from blelog.Configuration import Characteristic, Configuration
 
@@ -66,7 +66,7 @@ class ConsumerMgr:
             # Spinup all consumers:
             self._launch_consumers(halt)
 
-            while not halt.is_set():
+            while not (halt.is_set() and self.input_q.empty()):
                 await self._distribute_data()
                 self._monitor_timeouts()
 
@@ -75,6 +75,9 @@ class ConsumerMgr:
             log.exception(e)
             halt.set()
         finally:
+            total_output_q = sum([c.input_q.qsize() for c in self.consumers])
+            if total_output_q > 0:
+                print('ConsumerMgr ready to shut down. Waiting for %i items in output queues...' % total_output_q)
             await asyncio.gather(*self.consumer_tasks)
             print('ConsumerMgr shut down...')
 

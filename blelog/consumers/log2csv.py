@@ -7,15 +7,15 @@ PBL, ETH Zuerich
 ---------------------------------
 """
 import asyncio
+import csv
+import io
+import logging
+import os
 from asyncio.locks import Event
 from asyncio.queues import Queue
 from typing import List
-import logging
-import aiofiles
-import os
-import csv
-import io
 
+import aiofiles
 
 from blelog.Configuration import Configuration
 from blelog.ConsumerMgr import Consumer, NotifData
@@ -81,8 +81,7 @@ class Consumer_log2csv(Consumer):
         log = logging.getLogger('log')
 
         try:
-
-            while not halt.is_set():
+            while not (halt.is_set() and self.input_q.empty()):
                 try:
                     next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)  # type: NotifData
                     await self._log_to_file(next_data, halt)
@@ -94,8 +93,9 @@ class Consumer_log2csv(Consumer):
             log.exception(e)
             halt.set()
         finally:
-            queue_join = [o.input_q.join() for o in self.file_outputs.values()]
-            await asyncio.gather(*queue_join)
+            total_output_q = sum([c.input_q.qsize() for c in self.file_outputs.values()])
+            if total_output_q > 0:
+                print('Consumer log2csv ready to shut down. Waiting for %i items in output queues...' % total_output_q)
             await asyncio.gather(*self.tasks)
             print('Consumer log2csv shut down...')
 
