@@ -121,27 +121,27 @@ config = Configuration(
             data_decoder=decode_acc_gyr_qvar
         ),
 
-        Characteristic(
-            name='gyro_x',
-            uuid='3da22dc6-70d7-4217-9bb2-de5d79560011',
-            timeout=3,
-            column_headers=['index', 'gyro x'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
-        Characteristic(
-            name='gyro_y',
-            uuid='3da22dc6-70d7-4217-9bb2-de5d79560012',
-            timeout=3,
-            column_headers=['index', 'gyro y'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
-        Characteristic(
-            name='gyro_z',
-            uuid='3da22dc6-70d7-4217-9bb2-de5d79560013',
-            timeout=3,
-            column_headers=['index', 'gyro z'],
-            data_decoder=decode_acc_gyr_qvar
-        )
+        # Characteristic(
+        #     name='gyro_x',
+        #     uuid='3da22dc6-70d7-4217-9bb2-de5d79560011',
+        #     timeout=3,
+        #     column_headers=['index', 'gyro x'],
+        #     data_decoder=decode_acc_gyr_qvar
+        # ),
+        # Characteristic(
+        #     name='gyro_y',
+        #     uuid='3da22dc6-70d7-4217-9bb2-de5d79560012',
+        #     timeout=3,
+        #     column_headers=['index', 'gyro y'],
+        #     data_decoder=decode_acc_gyr_qvar
+        # ),
+        # Characteristic(
+        #     name='gyro_z',
+        #     uuid='3da22dc6-70d7-4217-9bb2-de5d79560013',
+        #     timeout=3,
+        #     column_headers=['index', 'gyro z'],
+        #     data_decoder=decode_acc_gyr_qvar
+        # )
     ],
 
     # ====================== Zephyr Fix ===========================
