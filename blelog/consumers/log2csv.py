@@ -44,8 +44,7 @@ class CSVLogger:
             while not (halt.is_set() and self.input_q.empty()):
                 try:
                     next_data = await asyncio.wait_for(self.input_q.get(), timeout=0.5)  # type: NotifData
-                    for row in next_data.data:
-                        await self.write_row(f, row)
+                    await self.write_rows(f, next_data.data)
                     await f.flush()
                     self.input_q.task_done()
                 except asyncio.TimeoutError:
@@ -67,6 +66,16 @@ class CSVLogger:
         row_str_io = io.StringIO()
         csv_writer = csv.writer(row_str_io)
         csv_writer.writerow(row)
+
+        await f.write(row_str_io.getvalue())
+
+    async def write_rows(self, f, rows):
+        row_str_io = io.StringIO()
+        csv_writer = csv.writer(row_str_io)
+
+        for row in rows:
+            csv_writer.writerow(row)
+
         await f.write(row_str_io.getvalue())
 
 
