@@ -124,10 +124,10 @@ class Scanner:
                         )
                         self.seen_devices[adr] = new_dev
 
-            # Check for seen-recently timeouts:
-            for dev in self.seen_devices.values():
-                if dev.state == SeenDeviceState.RECENTLY_SEEN:
-                    if dev.last_seen is not None:
-                        has_been = (time.monotonic_ns() - dev.last_seen)/1e9
-                        if has_been > self.config.seen_timeout:
-                            dev.state = SeenDeviceState.NOT_SEEN
+        # Check for seen-recently timeouts:
+        for dev in self.seen_devices.values():
+            if dev.state == SeenDeviceState.RECENTLY_SEEN:
+                if dev.last_seen is not None:
+                    has_been = (time.monotonic_ns() - dev.last_seen)/1e9
+                    if has_been > self.config.seen_timeout:
+                        dev.state = SeenDeviceState.NOT_SEEN
