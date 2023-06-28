@@ -128,6 +128,7 @@ class Consumer_log2csv(Consumer):
             name = self.config.device_aliases[device_adr]
         else:
             name = device_adr
+            name = device_adr.replace(':', '_')
 
         n = "%s_%s.csv" % (name, char.name)
         n = n.replace(' ', '_')

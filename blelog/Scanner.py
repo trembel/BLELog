@@ -112,6 +112,8 @@ class Scanner:
             else:
                 # Unknown device, check if name matches:
                 for r in self.name_regexes:
+                    if(scanned_dev.name is None):
+                        continue
                     if r.match(scanned_dev.name):
                         # It does, add the new device:
                         new_dev = SeenDevice(
