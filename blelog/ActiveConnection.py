@@ -188,6 +188,8 @@ class ActiveConnection:
         # Decode and package data:
         try:
             decoded_data = char.data_decoder(data)
+            if len(decoded_data) == 0:
+                return
             result = NotifData(self.adr, self.name, char, decoded_data)
             try:
                 self.output.put_nowait(result)
