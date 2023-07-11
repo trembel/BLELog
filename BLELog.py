@@ -47,8 +47,8 @@ async def main():
     consume_plot = Consumer_plotter(configuration)
     consume_mgr.add_consumer(consume_plot)
 
-    consume_index_check = Consumer_SPIndexChecker()
-    consume_mgr.add_consumer(consume_index_check)
+    # consume_index_check = Consumer_SPIndexChecker()
+    # consume_mgr.add_consumer(consume_index_check)
 
     # Create the scanner:
     scnr = Scanner(config=configuration)
