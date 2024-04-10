@@ -2,8 +2,11 @@
 blelog/consumers/log2csv.py
 Data consumer that writes data to CSV files.
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
 import asyncio

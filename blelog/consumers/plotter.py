@@ -2,8 +2,11 @@
 blelog/consumers/plotter.py
 Data consumer that displays data in a live plot
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 
 Matplotlib plot is defined in plot.py.

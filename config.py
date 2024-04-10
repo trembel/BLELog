@@ -2,11 +2,14 @@
 config.py
 Configuration Options.
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
-from blelog.Configuration import Configuration, Characteristic, TUI_Mode
+from blelog.Configuration import Characteristic, Configuration, TUI_Mode
 from char_decoders import *
 
 config = Configuration(
@@ -16,26 +19,21 @@ config = Configuration(
     # A list of addresses that BLELog will attempt to connect to:
     connect_device_adrs=[
         'E3:11:20:62:5D:3F',
-        'EB:E5:31:BF:2E:B5',
-        'F1:4C:55:7A:1C:FD'
     ],
 
     # Connect via device name:
     # A list of regexes. If a device's name matches any of the
     # regexes below, BLELog will attempt to connect to it:
     connect_device_name_regexes=[
-        # r'SmartPatch'
+        # r'FancyBluetoothGadget'
     ],
-
 
     # Device nicknames:
     # An (optional) alias to identify a given address by.
     # Used for status logging, TUI information, and file names.
     # If provided, it has to be unique.
     device_aliases={
-        'EB:E5:31:BF:2E:B5': 'SP-Case',
-        'E3:11:20:62:5D:3F': 'SP-NoCase',
-        'F1:4C:55:7A:1C:FD': 'SP-SmallBat'
+        'E3:11:20:62:5D:3F': 'Gadget007',
     },
 
     # Characteristics:
@@ -44,131 +42,32 @@ config = Configuration(
         Characteristic(
             # A name to identify the characteristics by:
             # Has to be unique.
-            name='ppg_red',
+            name='demo_char',
 
             # UUID:
             # Has to be unique.
             uuid='182281a8-153a-11ec-82a8-0242ac130001',
 
-            # Timeout (in seconds) for this characteristics.:
+            # Timeout (in seconds) for this characteristics:
             # If no notifications are received after this amount
-            # of time, the connection is closed.
-            # Set to 'None' to disable.
+            # of time, the connection is closed. Set to 'None'
+            # to disable.
             timeout=3,
 
             # The data decoder function.
-            # Produces a list data-rows from the received bytearray
-            # Defined in char_decoders.py
-            data_decoder=decode_ppg,
+            # Produces a list data-rows from the received bytearray Defined in
+            # char_decoders.py
+            # See `char_decoders.py` for more infos.
+            data_decoder=decode_demo_char,
 
-            # Column names for the information returned by
-            # the decoder function:
-            column_headers=['index', 'ppg red']
+            # Column names for the information returned by the decoder function:
+            # See `char_decoders.py` for more infos.
+            column_headers=['idx', 'data']
 
         ),
 
-        Characteristic(
-            name='ppg_ir',
-            uuid='182281a8-153a-11ec-82a8-0242ac130002',
-            timeout=3,
-            column_headers=['index', 'ppg ir'],
-            data_decoder=decode_ppg
-        ),
-
-        Characteristic(
-            name='ppg_green',
-            uuid='182281a8-153a-11ec-82a8-0242ac130003',
-            timeout=3,
-            column_headers=['index', 'ppg green'],
-            data_decoder=decode_ppg
-        ),
-
-        Characteristic(
-            name='temp',
-            uuid='18095c47-81d2-44e5-a350-aef131810001',
-            timeout=50,
-            column_headers=['index', 'temp'],
-            data_decoder=decode_temp
-        ),
-
-        Characteristic(
-            name='qvar',
-            uuid='d4eb1a81-2444-4d16-993e-4d28fe2c0001',
-            timeout=3,
-            column_headers=['index', 'qvar'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
-
-        Characteristic(
-            name='acc_x',
-            uuid='3da22dc6-70d7-4217-9bb2-de5d79560001',
-            timeout=3,
-            column_headers=['index', 'acc x'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
-        Characteristic(
-            name='acc_y',
-            uuid='3da22dc6-70d7-4217-9bb2-de5d79560002',
-            timeout=3,
-            column_headers=['index', 'acc y'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
-        Characteristic(
-            name='acc_z',
-            uuid='3da22dc6-70d7-4217-9bb2-de5d79560003',
-            timeout=3,
-            column_headers=['index', 'acc z'],
-            data_decoder=decode_acc_gyr_qvar
-        ),
-
-        # Characteristic(
-        #     name='gyro_x',
-        #     uuid='3da22dc6-70d7-4217-9bb2-de5d79560011',
-        #     timeout=3,
-        #     column_headers=['index', 'gyro x'],
-        #     data_decoder=decode_acc_gyr_qvar
-        # ),
-        # Characteristic(
-        #     name='gyro_y',
-        #     uuid='3da22dc6-70d7-4217-9bb2-de5d79560012',
-        #     timeout=3,
-        #     column_headers=['index', 'gyro y'],
-        #     data_decoder=decode_acc_gyr_qvar
-        # ),
-        # Characteristic(
-        #     name='gyro_z',
-        #     uuid='3da22dc6-70d7-4217-9bb2-de5d79560013',
-        #     timeout=3,
-        #     column_headers=['index', 'gyro z'],
-        #     data_decoder=decode_acc_gyr_qvar
-        # )
+        # ... Additional characteristics
     ],
-
-    # ====================== Zephyr Fix ===========================
-
-    # Workaround to a bug in zephyr/the smartpatch firmware.
-    # For details ask about "That queue bug in zephyr that cost Philipp
-    # a week's worth of sanity" at 'cortesis@ethz.ch' and he will
-    # happily explain something about mutexes - not exactly sure of the
-    # details.
-
-    # This will manually read a specified characteristic at a given
-    # interval, which avoids/solves a Smartpatch-internal queue overflow.
-    # The result is discarded.
-
-    # Enable this fix:
-    zephyr_fix_enabled=True,
-
-    # UUID of characteristic to poll
-    zephyr_fix_heartbeat_characteristic_uuid="00002A19-0000-1000-8000-00805F9B34FB",
-
-    # Minimimum interval (in seconds) at which this characteristic should
-    # be polled:
-    zephyr_fix_heartbeat_poll_rate=1,
-
-    # Timeout (in seconds). If there is no reponse after this period,
-    # The connection will be closed. Set to 'None' to disable.
-    zephyr_fix_heartbeat_timeout=4,
 
     # ================ Connection Parameters =====================
     # Maximum number of simultaneously active connections:
@@ -183,7 +82,7 @@ config = Configuration(
     connection_timeout_scan=20,
 
     # Maximum number of simultaneous connection attempts:
-    # Anything higher than one sometimes causes instability.
+    # Anything higher than one tends to cause instability.
     max_simultaneous_connection_attempts=1,
 
     # Initial Characteristic Timeout:
@@ -199,7 +98,7 @@ config = Configuration(
     # ================== Scanner Parameters ======================
     # Time, in seconds, a scan should last:
     # Increasing this may help if devices are not being discovered:
-    scan_duration=1.5,
+    scan_duration=3,
 
     # Time, in seconds, to pause between scans:
     scan_cooldown=0.1,
@@ -222,7 +121,7 @@ config = Configuration(
     # Automatically open the data plot GUI on startup:
     # Useful in 'CONSOLE' tui mode, as the plotter cannot
     # be manually opened.
-    plotter_open_by_default=False,
+    plotter_open_by_default=True,
 
     # Shut down BLElog when the plot GUI is closed:
     # Not recommended. This will stop BLElog if plotting fails
@@ -240,10 +139,10 @@ config = Configuration(
     plain_ascii_tui=False,
 
     # TUI Mode:
-    # CURSES: Fancy dashboard
-    # CONSOLE: log-only console output
+    # CURSES: Fancy dashboard. Tons of fun, sometimes not that compatible.
+    # CONSOLE: log-only console output. Much less fun, much more compatible.
     tui_mode=TUI_Mode.CURSES,
 
     # CURSE TUI update interval (in seconds):
-    curse_tui_interval=0.1
+    curse_tui_interval=0.33
 )

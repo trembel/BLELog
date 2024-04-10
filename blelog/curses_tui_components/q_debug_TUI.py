@@ -1,7 +1,16 @@
+"""
+blelog/curses_tui_component/q_debug_TUI.py
+TUI Component that shows queue size for throughput debugging.
+
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
+---------------------------------
+"""
 from dataclasses import dataclass
 from typing import List
-
-from tabulate import tabulate
 
 from blelog.ConnectionMgr import ConnectionMgr
 from blelog.ConsumerMgr import ConsumerMgr

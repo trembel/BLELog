@@ -1,26 +1,29 @@
 # BLELog
 
-Philipp Schilk, 2022
+Copyright (C) 2024 Philipp Schilk
+
 PBL, ETH Zuerich
+
+Released under the MIT License. See accompanying LICENSE file.
+
 ---
 
-A (hopefully) robust BLE Datalogger, that receives, decodes, stores and displays characteristic data.
+A simple python BLE data logger which receives, decodes, stores, and plots characteristic data in real time,
+that has proven quite convenient and flexible.
 
-Based on the [bleak](https://github.com/hbldh/bleak) cross-platform Bluetooth backend.
+Based on the [bleak](https://github.com/hbldh/bleak) cross-platform Bluetooth library.
 
 # Installation:
 
-BLELog works under Linux and Windows, but is much more stable under Linux (due to driver/backend differences).
-If *at all* possible, use Linux. 
+BLELog works under Linux and Windows, but tends to be more stable under Linux (due to driver/backend differences).
+If possible, use Linux.
 
 __WSL will not work.__
 
 MacOS is not yet supported. While technically possible, it would require major work as device addresses are handled
 differently.
 
-Tested under Python 3.9.7.
-
-Other (especially later) versions will likely work, but are not guaranteed.
+Tested under Python 3.9.7. Later versions will likely work.
 
 ## Linux:
 
@@ -28,7 +31,7 @@ First, clone this repository.
 
 All dependencies can be installed via `pip` and are listed in `requirements.txt`.
 
-I suggest setting up a virtual environment to run this script. 
+I suggest setting up a virtual environment to run this script.
 
 To do so, run:
 
@@ -66,7 +69,7 @@ First, clone this repository.
 All dependencies can be installed via `pip` and are listed in `requirements.txt`, with additional
 windows-only requirements in `requirements_windows.txt`:
 
-I suggest setting up a virtual environment to run this script. 
+I suggest setting up a virtual environment to run this script.
 
 To do so, run:
 
@@ -99,11 +102,12 @@ To run `BLELog`, execute `BLELog.py` with your venv active:
 python BLELog.py
 ```
 
-# Configuration:
+# Configuration and Documentation:
 
 To use BLELog, you will have to adapt some basic settings to your application.
 
-Modify the following three files:
+All documentation is contained in the following three files. Read them, and modify them
+for your application.
 
 ## config.py
 
@@ -123,7 +127,7 @@ Read the included comments and look at the example implementations.
 
 ## plot.py:
 
-Contains the live-plot setup. 
+Contains the live-plot setup.
 
 Read the included comments and look at the example implementations.
 
@@ -141,7 +145,7 @@ your Bluetooth connections or file I/O in an undefined state.
 Make sure the folder you set `log2csv_folder_name` to in `config.py` exists.
 
 #### Strange '?' symbols in output:
-Either switch to a different terminal with unicode support, or enable the 
+Either switch to a different terminal with unicode support, or enable the
 pure-ascii TUI with `plain_ascii_tui` in `config.py`.
 
 #### Plot is not showing any data:
@@ -151,20 +155,18 @@ correctly?
 
 #### Any other kind of strange terminal/TUI behaviour:
 While the default CURSES tui contains much more information, it sometimes
-does not play nice with certain terminal emulators on some platforms. 
+does not play nice with certain terminal emulators on some platforms.
 
-Using a different terminal emulator (for example Terminal vs cmd.exe 
+Using a different terminal emulator (for example Terminal vs cmd.exe
 in windows) often fixes the problem.
 
-If the TUI seems to 'flicker', reducing the update rate (`curse_tui_interva` in
+If the TUI seems to 'flicker', reducing the update rate (`curse_tui_interval` in
 `config.py`) can help.
 
-As a last resort, you can always fall back on the plain console TUI. 
+As a last resort, you can always fall back on the plain console TUI.
 (`tui_mode=TUI_Mode.CONSOLE` in `config.py`). It contains much less information,
 but is much more compatible.
 
-The console TUI does not support the 'g' shortcut to open the live 
+The console TUI does not support the 'g' shortcut to open the live
 data display. The `plotter_open_by_default` toggle in `config.py` can be
 used if the plot is needed.
-
-

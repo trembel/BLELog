@@ -2,8 +2,11 @@
 blelog/curses_tui_components/Log_TUI.py
 'Log' Section of the curses dashboard.
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
 from collections import deque

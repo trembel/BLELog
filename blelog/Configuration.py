@@ -2,8 +2,11 @@
 blelog/Configuration.py
 Defines the `Configuration` class that holds all settings
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
 from dataclasses import dataclass
@@ -42,10 +45,6 @@ class Configuration:
     max_simultaneous_connection_attempts: int
     connection_timeout_hard: float
     connection_timeout_scan: float
-    zephyr_fix_enabled: bool
-    zephyr_fix_heartbeat_characteristic_uuid: str
-    zephyr_fix_heartbeat_poll_rate: float
-    zephyr_fix_heartbeat_timeout: Union[None, float]
 
     # Scanner parameters:
     scan_duration: float

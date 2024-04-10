@@ -1,10 +1,13 @@
 """
 BLELog.py
-A (hopefully) robust BLE Datalogger, that receives, decodes, stores and 
-displays characteristic data.
+A simple python BLE data logger which receives, decodes, stores, and plots 
+characteristic data in real time, that has proven quite convenient and flexible.
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
 import asyncio
@@ -19,10 +22,9 @@ from blelog.ConnectionMgr import ConnectionMgr
 from blelog.ConsumerMgr import ConsumerMgr
 from blelog.consumers.log2csv import Consumer_log2csv
 from blelog.consumers.plotter import Consumer_plotter
-from blelog.consumers.sp_index_check import Consumer_SPIndexChecker
 from blelog.curses_tui_components.Connections_TUI import Connections_TUI
 from blelog.curses_tui_components.Log_TUI import Log_TUI
-from blelog.curses_tui_components.q_debug import q_TUI
+from blelog.curses_tui_components.q_debug_TUI import q_TUI
 from blelog.curses_tui_components.Scanner_TUI import Scanner_TUI
 from blelog.Scanner import Scanner
 from blelog.TUI import TUI
@@ -46,9 +48,6 @@ async def main():
 
     consume_plot = Consumer_plotter(configuration)
     consume_mgr.add_consumer(consume_plot)
-
-    # consume_index_check = Consumer_SPIndexChecker()
-    # consume_mgr.add_consumer(consume_index_check)
 
     # Create the scanner:
     scnr = Scanner(config=configuration)

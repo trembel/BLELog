@@ -2,8 +2,11 @@
 blelog/ActiveConnection.py
 A single connection to a specific device. Managed by ConnectionMgr.
 
-BLELog - Philipp Schilk, 2022
-PBL, ETH Zuerich
+BLELog
+Copyright (C) 2024 Philipp Schilk
+
+This work is licensed under the terms of the MIT license.  For a copy, see the 
+included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
 import asyncio
@@ -75,11 +78,6 @@ class ActiveConnection:
                 await self._connect(self.con)
                 self.initial_connection_time = time.monotonic_ns()
 
-                # Start zephyr fix task, if the zephyr hotfix is enabled:
-                if self.config.zephyr_fix_enabled:
-                    self.fix_task = asyncio.create_task(self._task_zephyr_fix(halt, con))
-                    asyncio.create_task(self._task_zephyr_fix(halt, con))
-
                 while not halt.is_set():
                     # Check for disconnection
                     # (Flag set by disconnect callback or when this connection is manually disconnected)
@@ -89,7 +87,7 @@ class ActiveConnection:
 
                     await self._check_for_timeout()
 
-                    await asyncio.sleep(0.02)
+                    await asyncio.sleep(0.05)
 
             except ActiveConnectionException:
                 pass
@@ -218,39 +216,6 @@ class ActiveConnection:
                 log.warning('Failed to disconnect from %s: OSError' % self.name)
             finally:
                 self.did_disconnect = True
-
-    async def _task_zephyr_fix(self, halt: Event, con: BleakClient) -> None:
-        """ Repeadetly poll a set characteristic to work around a zephyr bug"""
-
-        logged_enabled = False
-
-        try:
-            while not halt.is_set():
-                last_heartbeat = time.monotonic()
-                _ = await asyncio.wait_for(con.read_gatt_char(self.config.zephyr_fix_heartbeat_characteristic_uuid),
-                                           timeout=self.config.zephyr_fix_heartbeat_timeout)
-
-                if not logged_enabled:
-                    logged_enabled = True
-                    self.log.info("%s: Zephyr fix running." % self.name)
-
-                time_waited = time.monotonic() - last_heartbeat
-
-                if(time_waited < self.config.zephyr_fix_heartbeat_poll_rate):
-                    to_wait = min(self.config.zephyr_fix_heartbeat_poll_rate - time_waited, 0)
-                    await asyncio.sleep(to_wait)
-
-        except asyncio.TimeoutError:
-            # Manual read took longer than timeout.
-            self.log.warning("%s's zephyr-fix read timed-out. Disconnecting.." % self.name)
-            await self._do_disconnect()
-        except (BleakDBusError, BleakError, OSError) as e:
-            self.log.warning('%s: Failed to read zephyr-fix characteristic. (%s)' % (self.name, e))
-            await self._do_disconnect()
-        except Exception as e:
-            self.log.error('Connection %s\' zephyr-fix encountered an exception: %s' % (self.name, str(e)))
-            self.log.exception(e)
-            self.did_disconnect = True
 
     def active_time_str(self) -> str:
         if self.initial_connection_time is None:
