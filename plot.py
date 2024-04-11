@@ -5,7 +5,7 @@ The matplotlib plotting script to render the live data display.
 BLELog
 Copyright (C) 2024 Philipp Schilk
 
-This work is licensed under the terms of the MIT license.  For a copy, see the 
+This work is licensed under the terms of the MIT license.  For a copy, see the
 included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 
@@ -45,6 +45,7 @@ form of NotifData objects:
         data: List[List[Any]]            # The output of the decoder function
                                          # (as defined in char_decoders.py and
                                          # set in config.py)
+        data_raw: bytearray              # Raw received data
 
 # Important Notes
 

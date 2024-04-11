@@ -188,7 +188,7 @@ class ActiveConnection:
             decoded_data = char.data_decoder(data)
             if len(decoded_data) == 0:
                 return
-            result = NotifData(self.adr, self.name, char, decoded_data)
+            result = NotifData(self.adr, self.name, char, decoded_data, data)
             try:
                 self.output.put_nowait(result)
             except QueueFull:

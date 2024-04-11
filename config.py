@@ -5,7 +5,7 @@ Configuration Options.
 BLELog
 Copyright (C) 2024 Philipp Schilk
 
-This work is licensed under the terms of the MIT license.  For a copy, see the 
+This work is licensed under the terms of the MIT license.  For a copy, see the
 included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
@@ -144,5 +144,9 @@ config = Configuration(
     tui_mode=TUI_Mode.CURSES,
 
     # CURSE TUI update interval (in seconds):
-    curse_tui_interval=0.33
+    curse_tui_interval=0.33,
+
+    # Time period (in seconds) over which to calculate RX throughput.
+    # set to `None` to disable.
+    throughput_period_s=2
 )

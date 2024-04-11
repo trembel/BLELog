@@ -51,6 +51,7 @@ class NotifData:
     device_name_repr: str
     characteristic: Characteristic
     data: List[List[Any]]
+    data_raw: bytearray
 
 
 class ConsumerMgr:

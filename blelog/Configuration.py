@@ -58,6 +58,7 @@ class Configuration:
     log2csv_folder_name: str
     plotter_open_by_default: bool
     plotter_exit_on_plot_close: bool
+    throughput_period_s: float
 
     # General settings:
     log_file: str
