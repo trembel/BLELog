@@ -5,7 +5,7 @@ Repeatedly scans for new devices.
 BLELog
 Copyright (C) 2024 Philipp Schilk
 
-This work is licensed under the terms of the MIT license.  For a copy, see the 
+This work is licensed under the terms of the MIT license.  For a copy, see the
 included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
@@ -18,10 +18,11 @@ import time
 from asyncio import Event
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, Tuple, Union
 
 from bleak import BleakScanner
 from bleak.backends.device import BLEDevice
+from bleak.backends.scanner import AdvertisementData
 
 from blelog.Configuration import Configuration
 from blelog.Util import normalise_adr
@@ -81,7 +82,7 @@ class Scanner:
                 # Scan
                 try:
                     devices = await asyncio.wait_for(
-                        BleakScanner.discover(timeout=self.config.scan_duration),
+                        BleakScanner.discover(timeout=self.config.scan_duration, return_adv=True),
                         timeout=15)
 
                     t = time.monotonic_ns()
@@ -100,8 +101,8 @@ class Scanner:
         finally:
             print('Scanner shut down...')
 
-    def _update_seen_devices(self, devices: List[BLEDevice], t: int):
-        for scanned_dev in devices:
+    def _update_seen_devices(self, devices: Dict[str, Tuple[BLEDevice, AdvertisementData]], t: int):
+        for scanned_dev, adv_data in devices.values():
             adr = normalise_adr(scanned_dev.address)
 
             if adr in self.seen_devices:
@@ -109,13 +110,12 @@ class Scanner:
                 dev = self.seen_devices[adr]
                 dev.last_seen = t
                 dev.name = scanned_dev.name
-                dev.rssi = scanned_dev.rssi
+                dev.rssi = adv_data.rssi
                 dev.state = SeenDeviceState.RECENTLY_SEEN
-
             else:
                 # Unknown device, check if name matches:
                 for r in self.name_regexes:
-                    if(scanned_dev.name is None):
+                    if (scanned_dev.name is None):
                         continue
                     if r.match(scanned_dev.name):
                         # It does, add the new device:
@@ -125,7 +125,7 @@ class Scanner:
                             state=SeenDeviceState.RECENTLY_SEEN,
                             name=scanned_dev.name,
                             last_seen=t,
-                            rssi=scanned_dev.rssi,
+                            rssi=adv_data.rssi,
                         )
                         self.seen_devices[adr] = new_dev
 

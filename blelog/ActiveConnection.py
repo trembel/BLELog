@@ -5,7 +5,7 @@ A single connection to a specific device. Managed by ConnectionMgr.
 BLELog
 Copyright (C) 2024 Philipp Schilk
 
-This work is licensed under the terms of the MIT license.  For a copy, see the 
+This work is licensed under the terms of the MIT license.  For a copy, see the
 included LICENSE file or <https://opensource.org/licenses/MIT>.
 ---------------------------------
 """
@@ -20,6 +20,7 @@ from enum import Enum
 from typing import Dict, Union
 
 from bleak import BleakClient
+from bleak.backends.characteristic import BleakGATTCharacteristic
 from bleak.exc import BleakDBusError, BleakError
 
 from blelog.Configuration import Characteristic, Configuration
@@ -63,9 +64,9 @@ class ActiveConnection:
         try:
             con = BleakClient(
                 self.adr,
-                timeout=self.config.connection_timeout_scan
+                timeout=self.config.connection_timeout_scan,
+                disconnected_callback=self._disconnected_callback
             )
-            con.set_disconnected_callback(self._disconnected_callback)
 
             self.con = con
 
@@ -135,9 +136,6 @@ class ActiveConnection:
         # Enable notifications for all characteristics:
         for char in self.config.characteristics:
             # Generate a wrapper around the callback function to pass characteristic along.
-            # Bleak does not seem to offer a documented interface on how the 'dev' int
-            # passed to the callback can be used to identify which characteristic caused the
-            # notification
             callback_wrapper = functools.partial(self._notif_callback, char=char)
             await con.start_notify(char.uuid, callback_wrapper)
 
@@ -178,7 +176,7 @@ class ActiveConnection:
     def _disconnected_callback(self, _) -> None:
         self.did_disconnect = True
 
-    def _notif_callback(self, dev: int, data: bytearray, char: Characteristic) -> None:
+    def _notif_callback(self, dev: BleakGATTCharacteristic, data: bytearray, char: Characteristic) -> None:
         _ = dev
 
         self.last_notif[char.uuid] = time.monotonic_ns()
